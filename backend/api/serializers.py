@@ -75,9 +75,11 @@ class StatusSerializer(serializers.ModelSerializer):
 
 
 class AnimalPhotoSerializer(serializers.ModelSerializer):
+    animal_id = serializers.IntegerField(source='animal.id', read_only=True)
+
     class Meta:
         model = AnimalPhoto
-        fields = '__all__'
+        fields = ['id', 'animal_id', 'photo_url', 'is_main', 'order']
 
 
 class ServiceSerializer(serializers.ModelSerializer):
