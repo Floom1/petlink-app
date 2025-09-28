@@ -197,3 +197,7 @@ GitHub.sublime-settings
 !.vscode/extensions.json
 .history
 .cursor/rules/language.mdc
+frontend/app/src/main/res/drawable/man.jpg
+frontend/app/src/main/res/drawable/cat.png
+frontend/app/src/main/res/drawable/logo.png
+frontend/app/src/main/res/drawable/logo.png

@@ -25,9 +25,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var userEmail: EditText
     private lateinit var userPass: EditText
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
+
+        val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
+        if (sharedPreferences.getBoolean("is_logged_in", false)) {
+            startActivity(Intent(this, HomeActivity::class.java))
+            finish()
+            return
+        }
 
         userEmail = findViewById(R.id.user_login_auth)
         userPass = findViewById(R.id.user_pass_auth)
