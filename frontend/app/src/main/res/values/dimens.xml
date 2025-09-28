@@ -1,0 +1,20 @@
+<resources>
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">12dp</dimen>
+    <dimen name="spacing_lg">16dp</dimen>
+    <dimen name="spacing_xl">20dp</dimen>
+
+    <dimen name="corner_radius_md">16dp</dimen>
+
+    <dimen name="card_size_default">200dp</dimen>
+    <dimen name="card_size_min">160dp</dimen>
+    <dimen name="card_size_max">220dp</dimen>
+
+    <dimen name="bottom_nav_icon">24dp</dimen>
+    <dimen name="bottom_nav_padding_v">6dp</dimen>
+    <dimen name="bottom_nav_padding_h">16dp</dimen>
+
+    <dimen name="title_text_size">32sp</dimen>
+    <dimen name="bottom_nav_text_size">12sp</dimen>
+</resources>
