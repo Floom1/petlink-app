@@ -64,15 +64,37 @@ class LoginActivity : AppCompatActivity() {
             override fun onResponse(call: Call<AuthResponse>, response: Response<AuthResponse>) {
 
                 if (response.isSuccessful) {
+                    val token = response.body()?.token
                     val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
                     val editor = sharedPreferences.edit()
-                    editor.putString("auth_token", response.body()?.token)
+                    editor.putString("auth_token", token)
                     editor.putBoolean("is_logged_in", true)
                     editor.apply()
 
-                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    if (!token.isNullOrEmpty()) {
+                        RetrofitClient.apiService.me("Token $token").enqueue(object: Callback<com.example.petlink.data.model.UserResponse> {
+                            override fun onResponse(call2: Call<com.example.petlink.data.model.UserResponse>, resp: Response<com.example.petlink.data.model.UserResponse>) {
+                                if (resp.isSuccessful) {
+                                    val id = resp.body()?.id ?: -1
+                                    val sp = getSharedPreferences("user_session", MODE_PRIVATE)
+                                    sp.edit().putInt("id", id).apply()
+                                }
+                                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                                startActivity(intent)
+                                finish()
+                            }
+
+                            override fun onFailure(call2: Call<com.example.petlink.data.model.UserResponse>, t: Throwable) {
+                                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                                startActivity(intent)
+                                finish()
+                            }
+                        })
+                    } else {
+                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
                 } else {
                     Toast.makeText(this@LoginActivity, "Неверный email или пароль", Toast.LENGTH_LONG).show()
                 }

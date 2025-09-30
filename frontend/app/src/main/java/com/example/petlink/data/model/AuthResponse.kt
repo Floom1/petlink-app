@@ -9,5 +9,8 @@ data class UserResponse(
     val id: Int,
     val email: String,
     val full_name: String,
-    val is_shelter: Boolean
+    val is_shelter: Boolean,
+    val photo_url: String?,
+    val phone: String?,
+    val address: String?
 )

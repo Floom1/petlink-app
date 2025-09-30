@@ -6,10 +6,12 @@ import com.example.petlink.data.model.LoginRequest
 import com.example.petlink.data.model.RegistrationRequest
 import com.example.petlink.data.model.AnimalReq
 import com.example.petlink.data.model.StatusReq
+import com.example.petlink.data.model.UserResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Header
 
 
 interface PetLinkApi {
@@ -27,6 +29,9 @@ interface PetLinkApi {
 
     @GET("api/statuses/")
     fun getStatuses(): Call<List<StatusReq>>
+
+    @GET("api/auth/user/")
+    fun me(@Header("Authorization") authHeader: String): Call<UserResponse>
 
 
 
