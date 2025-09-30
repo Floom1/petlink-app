@@ -30,12 +30,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
 
-        val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
-        if (sharedPreferences.getBoolean("is_logged_in", false)) {
-            startActivity(Intent(this, HomeActivity::class.java))
-            finish()
-            return
-        }
+//        val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
+//        if (sharedPreferences.getBoolean("is_logged_in", false)) {
+//            startActivity(Intent(this, HomeActivity::class.java))
+//            finish()
+//            return
+//        }
 
         userEmail = findViewById(R.id.user_login_auth)
         userPass = findViewById(R.id.user_pass_auth)
@@ -68,19 +68,16 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<AuthResponse>, response: Response<AuthResponse>) {
 
                 if (response.isSuccessful) {
-                    // Сохраняем токен в SharedPreferences
                     val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
                     val editor = sharedPreferences.edit()
                     editor.putString("auth_token", response.body()?.token)
                     editor.putBoolean("is_logged_in", true)
                     editor.apply()
 
-                    // Переходим к главному экрану
                     val intent = Intent(this@MainActivity, HomeActivity::class.java)
                     startActivity(intent)
                     finish()
                 } else {
-                    // Обработка ошибки авторизации
                     Toast.makeText(this@MainActivity, "Неверный email или пароль", Toast.LENGTH_LONG).show()
                 }
             }

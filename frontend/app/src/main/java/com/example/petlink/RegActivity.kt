@@ -23,12 +23,12 @@ class RegActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reg)
 
-        val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
-        if (sharedPreferences.getBoolean("is_logged_in", false)) {
-            startActivity(Intent(this, HomeActivity::class.java))
-            finish()
-            return
-        }
+//        val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
+//        if (sharedPreferences.getBoolean("is_logged_in", false)) {
+//            startActivity(Intent(this, HomeActivity::class.java))
+//            finish()
+//            return
+//        }
 
         userLogin = findViewById(R.id.user_login)
         userEmail = findViewById(R.id.user_email)
