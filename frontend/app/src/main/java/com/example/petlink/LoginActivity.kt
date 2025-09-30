@@ -4,13 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.petlink.data.model.AuthResponse
 import com.example.petlink.data.model.LoginRequest
 import com.example.petlink.databinding.ActivityAuthBinding
@@ -20,7 +16,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-class MainActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAuthBinding
     private lateinit var userEmail: EditText
     private lateinit var userPass: EditText
@@ -32,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
 //        val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
 //        if (sharedPreferences.getBoolean("is_logged_in", false)) {
-//            startActivity(Intent(this, HomeActivity::class.java))
+//            startActivity(Intent(this, MainActivity::class.java))
 //            finish()
 //            return
 //        }
@@ -74,16 +70,16 @@ class MainActivity : AppCompatActivity() {
                     editor.putBoolean("is_logged_in", true)
                     editor.apply()
 
-                    val intent = Intent(this@MainActivity, HomeActivity::class.java)
+                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
                     startActivity(intent)
                     finish()
                 } else {
-                    Toast.makeText(this@MainActivity, "Неверный email или пароль", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@LoginActivity, "Неверный email или пароль", Toast.LENGTH_LONG).show()
                 }
             }
 
             override fun onFailure(call: Call<AuthResponse>, t: Throwable) {
-                Toast.makeText(this@MainActivity, "Ошибка соединения: ${t.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@LoginActivity, "Ошибка соединения: ${t.message}", Toast.LENGTH_LONG).show()
             }
         })
     }

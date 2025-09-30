@@ -28,4 +28,6 @@ interface PetLinkApi {
     @GET("api/statuses/")
     fun getStatuses(): Call<List<StatusReq>>
 
+
+
 }

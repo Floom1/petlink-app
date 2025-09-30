@@ -32,7 +32,7 @@
             tools:srcCompat="@tools:sample/avatars" />
 
         <EditText
-            android:id="@+id/user_login_auth"
+            android:id="@+id/profile_email"
             android:layout_width="220dp"
             android:layout_height="50dp"
             android:ems="10"
@@ -43,7 +43,18 @@
             android:layout_gravity="center"
             android:textColor="#000"/>
         <EditText
-            android:id="@+id/user_pass_auth"
+            android:id="@+id/profile_name"
+            android:layout_width="220dp"
+            android:layout_height="50dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:hint="Введите имя"
+            android:textColorHint="#6a6a6a"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:textColor="#000"/>
+        <EditText
+            android:id="@+id/profile_password"
             android:layout_width="220dp"
             android:layout_height="50dp"
             android:ems="10"

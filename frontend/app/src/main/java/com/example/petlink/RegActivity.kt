@@ -25,7 +25,7 @@ class RegActivity : AppCompatActivity() {
 
 //        val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
 //        if (sharedPreferences.getBoolean("is_logged_in", false)) {
-//            startActivity(Intent(this, HomeActivity::class.java))
+//            startActivity(Intent(this, MainActivity::class.java))
 //            finish()
 //            return
 //        }
@@ -38,7 +38,7 @@ class RegActivity : AppCompatActivity() {
         val regButton: Button = findViewById(R.id.button_reg)
 
         toAuth.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
+            startActivity(Intent(this, LoginActivity::class.java))
         }
 
         regButton.setOnClickListener {
@@ -78,7 +78,7 @@ class RegActivity : AppCompatActivity() {
                     editor.putBoolean("is_logged_in", true)
                     editor.apply()
 
-                    startActivity(Intent(this@RegActivity, MainActivity::class.java))
+                    startActivity(Intent(this@RegActivity, LoginActivity::class.java))
                     finish()
                 } else {
                     Toast.makeText(this@RegActivity, "Ошибка регистрации", Toast.LENGTH_LONG).show()
