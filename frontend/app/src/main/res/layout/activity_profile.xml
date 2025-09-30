@@ -6,14 +6,18 @@
     android:background="#DDF8FC"
     android:orientation="vertical">
 
-
-    <LinearLayout
+    <include layout="@layout/toolbar" />
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_weight="1">
 
-        <include layout="@layout/toolbar" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
 
         <TextView
             android:id="@+id/title"
@@ -25,52 +29,133 @@
             android:textColor="#000000"
             android:textSize="@dimen/title_text_size" />
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:srcCompat="@tools:sample/avatars" />
+        <FrameLayout
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_gravity="center">
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="@drawable/rounded_square_border"
+                android:clipToOutline="true"
+                android:padding="1dp" />
+        </FrameLayout>
 
+        <TextView
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:text="Почта"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:gravity="start" />
         <EditText
             android:id="@+id/profile_email"
             android:layout_width="220dp"
-            android:layout_height="50dp"
-            android:ems="10"
-            android:inputType="text"
-            android:hint="Введите Почту"
-            android:textColorHint="#6a6a6a"
+            android:layout_height="40dp"
+            android:ems="100"
+            android:inputType="textEmailAddress"
+            android:layout_marginTop="6dp"
+            android:layout_gravity="center"
+            android:background="@drawable/edittext_rounded_border"
+            android:padding="10dp"
+            android:textColor="#000"
+            android:textColorHint="#6a6a6a"/>
+        <TextView
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:layout_gravity="center"
-            android:textColor="#000"/>
+            android:text="Имя"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:gravity="start" />
         <EditText
             android:id="@+id/profile_name"
             android:layout_width="220dp"
-            android:layout_height="50dp"
+            android:layout_height="40dp"
             android:ems="10"
             android:inputType="textPersonName"
-            android:hint="Введите имя"
-            android:textColorHint="#6a6a6a"
+            android:layout_marginTop="6dp"
+            android:layout_gravity="center"
+            android:background="@drawable/edittext_rounded_border"
+            android:padding="10dp"
+            android:textColor="#000"
+            android:textColorHint="#6a6a6a"/>
+        <TextView
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:layout_gravity="center"
-            android:textColor="#000"/>
+            android:text="Контактный телефон"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:gravity="start" />
+        <EditText
+            android:id="@+id/profile_phone"
+            android:layout_width="220dp"
+            android:layout_height="40dp"
+            android:ems="10"
+            android:inputType="phone"
+            android:layout_marginTop="6dp"
+            android:layout_gravity="center"
+            android:background="@drawable/edittext_rounded_border"
+            android:padding="10dp"
+            android:textColor="#000"
+            android:textColorHint="#6a6a6a"/>
+        <TextView
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:text="Адрес проживания"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:gravity="start" />
+        <EditText
+            android:id="@+id/profile_address"
+            android:layout_width="220dp"
+            android:layout_height="40dp"
+            android:ems="10"
+            android:inputType="textPostalAddress"
+            android:layout_marginTop="6dp"
+            android:layout_gravity="center"
+            android:background="@drawable/edittext_rounded_border"
+            android:padding="10dp"
+            android:textColor="#000"
+            android:textColorHint="#6a6a6a"/>
+        <TextView
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_gravity="center"
+            android:text="Пароль"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:gravity="start" />
+
         <EditText
             android:id="@+id/profile_password"
             android:layout_width="220dp"
-            android:layout_height="50dp"
+            android:layout_height="40dp"
             android:ems="10"
             android:inputType="textPassword"
-            android:hint="Введите пароль"
-            android:textColorHint="#6a6a6a"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="6dp"
             android:layout_gravity="center"
-            android:textColor="#000"/>
+            android:background="@drawable/edittext_rounded_border"
+            android:padding="10dp"
+            android:textColor="#000"
+            android:textColorHint="#6a6a6a"/>
 
         <Button
             android:id="@+id/button_auth2"
             android:layout_width="220dp"
             android:layout_height="40dp"
             android:layout_gravity="center"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/btn_stroke_gray"
             android:backgroundTint="@null"
             app:backgroundTint="@null"
@@ -82,14 +167,27 @@
             android:layout_width="220dp"
             android:layout_height="40dp"
             android:layout_gravity="center"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/btn_stroke_black"
             android:backgroundTint="@null"
             app:backgroundTint="@null"
             android:text="Подтвердить изменения"
             android:textColor="#FFFFFF" />
 
-    </LinearLayout>
+        <Button
+            android:id="@+id/button_logout"
+            android:layout_width="220dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/btn_stroke_gray"
+            android:backgroundTint="@null"
+            app:backgroundTint="@null"
+            android:text="Выйти из аккаунта"
+            android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+    </ScrollView>
 
     <include
         layout="@layout/nav_menu"

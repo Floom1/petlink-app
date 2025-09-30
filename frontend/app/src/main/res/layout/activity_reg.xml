@@ -10,87 +10,142 @@
     tools:context=".RegActivity">
 
     <include layout="@layout/toolbar" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="48dp"
-        android:fontFamily="sans-serif"
-        android:text="Создайте аккаунт"
-        android:textColor="#000"
-        android:textSize="25dp"
-        android:textStyle="bold" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/user_login"
-        android:layout_width="230dp"
-        android:layout_height="50dp"
-        android:ems="10"
-        android:inputType="text"
-        android:hint="Введите Логин/Ваше имя"
-        android:textColorHint="#6a6a6a"
-        android:layout_marginTop="20dp"
-        android:layout_gravity="center"
-        android:textColor="#000"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="48dp"
+                android:fontFamily="sans-serif"
+                android:text="Создайте аккаунт"
+                android:textColor="#000"
+                android:textSize="25dp"
+                android:textStyle="bold" />
 
-    <EditText
-        android:id="@+id/user_email"
-        android:layout_width="230dp"
-        android:layout_height="50dp"
-        android:ems="10"
-        android:inputType="textEmailAddress"
-        android:hint="Введите Почту"
-        android:textColorHint="#6a6a6a"
-        android:layout_marginTop="20dp"
-        android:layout_gravity="center"
-        android:textColor="#000"/>
+            <TextView
+                android:layout_width="230dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:text="Имя / Логин"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:gravity="start" />
+            <EditText
+                android:id="@+id/user_login"
+                android:layout_width="230dp"
+                android:layout_height="40dp"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:hint="Введите Логин/Ваше имя"
+                android:textColorHint="#6a6a6a"
+                android:layout_marginTop="6dp"
+                android:layout_gravity="center"
+                android:background="@drawable/edittext_rounded_border"
+                android:padding="10dp"
+                android:textColor="#000"/>
 
-    <EditText
-        android:id="@+id/user_password"
-        android:layout_width="230dp"
-        android:layout_height="50dp"
-        android:ems="10"
-        android:inputType="textPassword"
-        android:hint="Введите пароль"
-        android:textColorHint="#6a6a6a"
-        android:layout_marginTop="20dp"
-        android:layout_gravity="center"
-        android:textColor="#000"/>
+            <TextView
+                android:layout_width="230dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:text="Почта"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:gravity="start" />
+            <EditText
+                android:id="@+id/user_email"
+                android:layout_width="230dp"
+                android:layout_height="40dp"
+                android:ems="10"
+                android:inputType="textEmailAddress"
+                android:hint="Введите Почту"
+                android:textColorHint="#6a6a6a"
+                android:layout_marginTop="6dp"
+                android:layout_gravity="center"
+                android:background="@drawable/edittext_rounded_border"
+                android:padding="10dp"
+                android:textColor="#000"/>
 
-    <EditText
-        android:id="@+id/user_password_confirm"
-        android:layout_width="230dp"
-        android:layout_height="50dp"
-        android:ems="10"
-        android:inputType="textPassword"
-        android:hint="Подтвердите пароль"
-        android:textColorHint="#6a6a6a"
-        android:layout_marginTop="20dp"
-        android:layout_gravity="center"
-        android:textColor="#000"/>
+            <TextView
+                android:layout_width="230dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:text="Пароль"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:gravity="start" />
+            <EditText
+                android:id="@+id/user_password"
+                android:layout_width="230dp"
+                android:layout_height="40dp"
+                android:ems="10"
+                android:inputType="textPassword"
+                android:hint="Введите пароль"
+                android:textColorHint="#6a6a6a"
+                android:layout_marginTop="6dp"
+                android:layout_gravity="center"
+                android:background="@drawable/edittext_rounded_border"
+                android:padding="10dp"
+                android:textColor="#000"/>
 
-    <Button
-        android:id="@+id/button_reg"
-        android:layout_width="230dp"
-        android:layout_height="wrap_content"
-        android:text="Зарегистрироваться"
-        android:textStyle="bold"
-        android:layout_gravity="center"
-        android:textColor="#5e4602"
-        android:backgroundTint="#C7F0BD"
-        android:layout_marginTop="30dp" />
+            <TextView
+                android:layout_width="230dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:text="Подтверждение пароля"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:gravity="start" />
+            <EditText
+                android:id="@+id/user_password_confirm"
+                android:layout_width="230dp"
+                android:layout_height="40dp"
+                android:ems="10"
+                android:inputType="textPassword"
+                android:hint="Подтвердите пароль"
+                android:textColorHint="#6a6a6a"
+                android:layout_marginTop="6dp"
+                android:layout_gravity="center"
+                android:background="@drawable/edittext_rounded_border"
+                android:padding="10dp"
+                android:textColor="#000"/>
 
-    <TextView
-        android:id="@+id/link_to_auth"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="24dp"
-        android:fontFamily="sans-serif"
-        android:text="Перейти к авторизации"
-        android:textColor="#000"
-        android:textSize="17dp" />
+            <Button
+                android:id="@+id/button_reg"
+                android:layout_width="230dp"
+                android:layout_height="wrap_content"
+                android:text="Зарегистрироваться"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:textColor="#5e4602"
+                android:backgroundTint="#C7F0BD"
+                android:layout_marginTop="30dp" />
 
+            <TextView
+                android:id="@+id/link_to_auth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="50dp"
+                android:fontFamily="sans-serif"
+                android:text="Перейти к авторизации"
+                android:textColor="#000"
+                android:textSize="17dp" />
 
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>
