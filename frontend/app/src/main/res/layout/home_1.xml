@@ -39,13 +39,48 @@
                 android:padding="@dimen/spacing_md"
                 android:rowCount="2"
                 android:useDefaultMargins="true">
-                <include layout="@layout/item_ad" android:layout_width="0dp" android:layout_height="200dp" android:layout_columnWeight="1"/>
-                <include layout="@layout/item_ad" android:layout_width="0dp" android:layout_height="200dp" android:layout_columnWeight="1"/>
-                <include layout="@layout/item_ad" android:layout_width="0dp" android:layout_height="200dp" android:layout_columnWeight="1"/>
-                <include layout="@layout/item_ad" android:layout_width="0dp" android:layout_height="200dp" android:layout_columnWeight="1"/>
-                <include layout="@layout/item_ad" android:layout_width="0dp" android:layout_height="200dp" android:layout_columnWeight="1"/>
-                <include layout="@layout/item_ad" android:layout_width="0dp" android:layout_height="200dp" android:layout_columnWeight="1"/>
-                <include layout="@layout/item_ad" android:layout_width="0dp" android:layout_height="200dp" android:layout_columnWeight="1"/>
+
+                <include
+                    layout="@layout/item_ad"
+                    android:layout_width="0dp"
+                    android:layout_height="200dp"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_ad"
+                    android:layout_width="0dp"
+                    android:layout_height="200dp"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_ad"
+                    android:layout_width="0dp"
+                    android:layout_height="200dp"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_ad"
+                    android:layout_width="0dp"
+                    android:layout_height="200dp"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_ad"
+                    android:layout_width="0dp"
+                    android:layout_height="200dp"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_ad"
+                    android:layout_width="0dp"
+                    android:layout_height="200dp"
+                    android:layout_columnWeight="1" />
+
+                <include
+                    layout="@layout/item_ad"
+                    android:layout_width="0dp"
+                    android:layout_height="200dp"
+                    android:layout_columnWeight="1" />
             </GridLayout>
         </LinearLayout>
     </ScrollView>
