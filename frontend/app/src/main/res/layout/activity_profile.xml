@@ -130,7 +130,7 @@
 
 
         <Button
-            android:id="@+id/button_auth2"
+            android:id="@+id/button_photo"
             android:layout_width="220dp"
             android:layout_height="40dp"
             android:layout_gravity="center"
@@ -142,7 +142,7 @@
             android:textColor="#FFFFFF"/>
 
         <Button
-            android:id="@+id/button_auth"
+            android:id="@+id/button_access"
             android:layout_width="220dp"
             android:layout_height="40dp"
             android:layout_gravity="center"

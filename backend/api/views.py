@@ -1,10 +1,14 @@
+import os
+from django.conf import settings
 from rest_framework import viewsets, generics, permissions
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import get_user_model
-
+from rest_framework.views import APIView
 from .models import *
 from .serializers import *
+from django.core.files.storage import FileSystemStorage
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 class AnimalViewSet(viewsets.ModelViewSet):
@@ -84,3 +88,24 @@ class UserAPI(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class UploadView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, *args, **kwargs):
+        image = request.FILES.get('image')
+        if not image:
+            return Response({"error": "No image provided"}, status=400)
+
+        # Сохраняем файл в media/profile_photos/
+        upload_dir = os.path.join(settings.MEDIA_ROOT, 'profile_photos')
+        os.makedirs(upload_dir, exist_ok=True)
+        storage = FileSystemStorage(location=upload_dir)
+        filename = storage.save(image.name, image)
+        relative_path = os.path.join('profile_photos', filename).replace('\\', '/')
+
+        # Полный URL
+        url = request.build_absolute_uri(settings.MEDIA_URL + relative_path)
+        return Response({"url": url}, status=201)

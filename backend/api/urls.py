@@ -20,4 +20,5 @@ router.register(r'service_apps', views.ServiceApplicationViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('upload/', views.UploadView.as_view(), name='upload'),
 ]

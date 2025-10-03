@@ -5,7 +5,8 @@ from pathlib import Path
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
