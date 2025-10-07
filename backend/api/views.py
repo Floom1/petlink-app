@@ -99,13 +99,11 @@ class UploadView(APIView):
         if not image:
             return Response({"error": "No image provided"}, status=400)
 
-        # Сохраняем файл в media/profile_photos/
         upload_dir = os.path.join(settings.MEDIA_ROOT, 'profile_photos')
         os.makedirs(upload_dir, exist_ok=True)
         storage = FileSystemStorage(location=upload_dir)
         filename = storage.save(image.name, image)
         relative_path = os.path.join('profile_photos', filename).replace('\\', '/')
 
-        # Полный URL
         url = request.build_absolute_uri(settings.MEDIA_URL + relative_path)
         return Response({"url": url}, status=201)
