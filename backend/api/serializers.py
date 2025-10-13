@@ -95,9 +95,29 @@ class ServicePhotoSerializer(serializers.ModelSerializer):
 
 
 class TestResultSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+
     class Meta:
         model = TestResult
-        fields = '__all__'
+        fields = ['id', 'user_id', 'residence_type', 'weekday_time', 'has_children', 'planned_move', 'pet_experience', 'has_allergies', 'created_at']
+        read_only_fields = ('id', 'user_id', 'created_at')
+
+    # def create(self, validated_data):
+    #     validated_data['user'] = self.context['request'].user
+    #     return super().create(validated_data)
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        validated_data['user'] = user
+
+        try:
+            existing_result = TestResult.objects.get(user=user)
+            for attr, value in validated_data.items():
+                setattr(existing_result, attr, value)
+            existing_result.save()
+            return existing_result
+        except TestResult.DoesNotExist:
+            return super().create(validated_data)
 
 
 class AnimalApplicationSerializer(serializers.ModelSerializer):
