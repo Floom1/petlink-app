@@ -25,8 +25,8 @@ class StatusAdmin(admin.ModelAdmin):
 
 @admin.register(Animal)
 class AnimalAdmin(admin.ModelAdmin):
-    list_display = ('name', 'user', 'breed', 'age', 'status')
-    list_filter = ('status', 'is_sterilized', 'has_vaccinations')
+    list_display = ('name', 'user', 'breed', 'age', 'status', 'is_hypoallergenic', 'child_friendly', 'space_requirements')
+    list_filter = ('status', 'is_sterilized', 'has_vaccinations', 'is_hypoallergenic', 'child_friendly', 'space_requirements')
     search_fields = ('name', 'description')
 
 
@@ -48,8 +48,9 @@ class ServicePhotoAdmin(admin.ModelAdmin):
 
 @admin.register(TestResult)
 class TestResultAdmin(admin.ModelAdmin):
-    list_display = ('user', 'has_yard', 'home_time', 'has_children')
-    list_filter = ('has_yard', 'has_children')
+    list_display = ('user', 'residence_type', 'weekday_time', 'has_children', 'planned_move', 'pet_experience', 'has_allergies')
+    list_filter = ('residence_type', 'weekday_time', 'has_children', 'planned_move', 'pet_experience', 'has_allergies')
+    search_fields = ('user__email', 'user__full_name')
 
 
 @admin.register(AnimalApplication)

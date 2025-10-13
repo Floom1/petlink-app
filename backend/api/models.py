@@ -85,6 +85,13 @@ class Animal(models.Model):
     is_sterilized = models.BooleanField(default=False)
     has_vaccinations = models.BooleanField(default=False)
     habits = models.TextField(blank=True, null=True)
+    is_hypoallergenic = models.BooleanField(default=False)
+    child_friendly = models.BooleanField(default=False)
+    space_requirements = models.CharField(max_length=20, choices=[
+        ('low', 'Низкие'),
+        ('medium', 'Средние'),
+        ('high', 'Высокие'),
+    ], default='medium')
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -130,15 +137,30 @@ class ServicePhoto(models.Model):
 
 
 class TestResult(models.Model):
+    RESIDENCE_CHOICES = [
+        ('apartment', 'Квартира'),
+        ('private', 'Частный дом'),
+    ]
+
+    WEEKDAY_TIME_CHOICES = [
+        ('lt4', 'Менее 4 часов'),
+        ('4_8', '4-8 часов'),
+        ('gt8', 'Более 8 часов'),
+    ]
+
+    EXPERIENCE_CHOICES = [
+        ('none', 'Нет опыта'),
+        ('had_before', 'Имел(а) животное ранее'),
+        ('now', 'В данный момент владею животным'),
+    ]
+
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='test_result')
-    has_yard = models.BooleanField(default=False)
-    home_time = models.IntegerField(default=0)
+    residence_type = models.CharField(max_length=20, choices=RESIDENCE_CHOICES, blank=True, null=True)
+    weekday_time = models.CharField(max_length=10, choices=WEEKDAY_TIME_CHOICES, blank=True, null=True)
     has_children = models.BooleanField(default=False)
-    pet_experience = models.IntegerField(default=0)
-    allergies = models.BooleanField(default=False)
-    housing_type = models.CharField(max_length=50, blank=True, null=True)
     planned_move = models.BooleanField(default=False)
-    planned_move_date = models.DateField(blank=True, null=True)
+    pet_experience = models.CharField(max_length=20, choices=EXPERIENCE_CHOICES, blank=True, null=True)
+    has_allergies = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
