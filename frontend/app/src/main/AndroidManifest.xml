@@ -33,6 +33,9 @@
         <activity
             android:name=".MainActivity"
             android:exported="true" />
+        <activity
+            android:name=".TestActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
