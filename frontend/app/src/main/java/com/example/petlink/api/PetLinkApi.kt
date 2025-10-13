@@ -8,6 +8,7 @@ import com.example.petlink.data.model.RegistrationRequest
 import com.example.petlink.data.model.AnimalReq
 import com.example.petlink.data.model.StatusReq
 import com.example.petlink.data.model.UserResponse
+import com.example.petlink.data.model.TestResult
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -53,5 +54,11 @@ interface PetLinkApi {
         @Header("Authorization") authHeader: String,
         @Part image: MultipartBody.Part
     ): Call<UploadResponse>
+
+    @POST("api/tests/")
+    fun submitTest(
+        @Header("Authorization") authHeader: String,
+        @Body testResult: TestResult
+    ): Call<TestResult>
 
 }

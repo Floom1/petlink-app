@@ -57,6 +57,10 @@ class ProfileActivity : AppCompatActivity() {
             pickImageLauncher.launch("image/*")
         }
 
+        findViewById<Button>(R.id.button_test)?.setOnClickListener {
+            startActivity(android.content.Intent(this, TestActivity::class.java))
+        }
+
         loadUser()
     }
 
