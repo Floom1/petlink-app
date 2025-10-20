@@ -15,6 +15,58 @@ class AnimalViewSet(viewsets.ModelViewSet):
     queryset = Animal.objects.all()
     serializer_class = AnimalSerializer
 
+    def list(self, request, *args, **kwargs):
+        qs = Animal.objects.all()
+        # Фильтруем только доступных по умолчанию
+        qs = qs.filter(status__is_available=True)
+
+        species = request.query_params.get('species')
+        breed = request.query_params.get('breed')
+        gender = request.query_params.get('gender')
+        age_min = request.query_params.get('age_min')
+        age_max = request.query_params.get('age_max')
+        price_min = request.query_params.get('price_min')
+        price_max = request.query_params.get('price_max')
+        is_hypo = request.query_params.get('is_hypoallergenic')
+        child_friendly = request.query_params.get('child_friendly')
+        space_req = request.query_params.get('space_requirements')
+
+        if species:
+            qs = qs.filter(breed__species_id=species)
+        if breed:
+            qs = qs.filter(breed_id=breed)
+        if gender in ('M', 'F'):
+            qs = qs.filter(gender=gender)
+        if age_min is not None:
+            try:
+                qs = qs.filter(age__gte=float(age_min))
+            except ValueError:
+                pass
+        if age_max is not None:
+            try:
+                qs = qs.filter(age__lte=float(age_max))
+            except ValueError:
+                pass
+        if price_min is not None:
+            try:
+                qs = qs.filter(price__gte=float(price_min))
+            except ValueError:
+                pass
+        if price_max is not None:
+            try:
+                qs = qs.filter(price__lte=float(price_max))
+            except ValueError:
+                pass
+        if is_hypo in ('true', 'false'):
+            qs = qs.filter(is_hypoallergenic=(is_hypo == 'true'))
+        if child_friendly in ('true', 'false'):
+            qs = qs.filter(child_friendly=(child_friendly == 'true'))
+        if space_req in ('low', 'medium', 'high'):
+            qs = qs.filter(space_requirements=space_req)
+
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()

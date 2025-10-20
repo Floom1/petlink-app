@@ -14,6 +14,7 @@ import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Query
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -30,7 +31,18 @@ interface PetLinkApi {
     fun login(@Body loginRequest: LoginRequest): Call<AuthResponse>
 
     @GET("api/animals/")
-    fun getAnimals(): Call<List<AnimalReq>>
+    fun getAnimals(
+        @Query("species") speciesId: Int? = null,
+        @Query("breed") breedId: Int? = null,
+        @Query("gender") gender: String? = null,
+        @Query("age_min") ageMin: Double? = null,
+        @Query("age_max") ageMax: Double? = null,
+        @Query("price_min") priceMin: Double? = null,
+        @Query("price_max") priceMax: Double? = null,
+        @Query("is_hypoallergenic") isHypoallergenic: Boolean? = null,
+        @Query("child_friendly") childFriendly: Boolean? = null,
+        @Query("space_requirements") spaceRequirements: String? = null
+    ): Call<List<AnimalReq>>
 
     @GET("api/animal_photos/")
     fun getAnimalPhotos(): Call<List<AnimalPhotoReq>>
