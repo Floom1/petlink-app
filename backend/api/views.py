@@ -9,6 +9,7 @@ from .models import *
 from .serializers import *
 from django.core.files.storage import FileSystemStorage
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.db.models import Q
 
 
 class AnimalViewSet(viewsets.ModelViewSet):
@@ -17,7 +18,6 @@ class AnimalViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         qs = Animal.objects.all()
-        # Фильтруем только доступных по умолчанию
         qs = qs.filter(status__is_available=True)
 
         species = request.query_params.get('species')
@@ -30,6 +30,8 @@ class AnimalViewSet(viewsets.ModelViewSet):
         is_hypo = request.query_params.get('is_hypoallergenic')
         child_friendly = request.query_params.get('child_friendly')
         space_req = request.query_params.get('space_requirements')
+        is_ster = request.query_params.get('is_sterilized')
+        has_vacc = request.query_params.get('has_vaccinations')
 
         if species:
             qs = qs.filter(breed__species_id=species)
@@ -47,22 +49,36 @@ class AnimalViewSet(viewsets.ModelViewSet):
                 qs = qs.filter(age__lte=float(age_max))
             except ValueError:
                 pass
-        if price_min is not None:
-            try:
-                qs = qs.filter(price__gte=float(price_min))
-            except ValueError:
-                pass
-        if price_max is not None:
-            try:
-                qs = qs.filter(price__lte=float(price_max))
-            except ValueError:
-                pass
+        min_val = None
+        max_val = None
+        try:
+            if price_min is not None:
+                min_val = float(price_min)
+        except ValueError:
+            min_val = None
+        try:
+            if price_max is not None:
+                max_val = float(price_max)
+        except ValueError:
+            max_val = None
+
+        if min_val is not None and min_val > 0:
+            qs = qs.filter(price__gte=min_val)
+            if max_val is not None:
+                qs = qs.filter(price__lte=max_val)
+        else:
+            if max_val is not None:
+                qs = qs.filter(Q(price__lte=max_val) | Q(price__isnull=True))
         if is_hypo in ('true', 'false'):
             qs = qs.filter(is_hypoallergenic=(is_hypo == 'true'))
         if child_friendly in ('true', 'false'):
             qs = qs.filter(child_friendly=(child_friendly == 'true'))
         if space_req in ('low', 'medium', 'high'):
             qs = qs.filter(space_requirements=space_req)
+        if is_ster == 'true':
+            qs = qs.filter(is_sterilized=True)
+        if has_vacc == 'true':
+            qs = qs.filter(has_vaccinations=True)
 
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)

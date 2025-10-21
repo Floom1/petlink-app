@@ -7,6 +7,8 @@ import com.example.petlink.data.model.LoginRequest
 import com.example.petlink.data.model.RegistrationRequest
 import com.example.petlink.data.model.AnimalReq
 import com.example.petlink.data.model.StatusReq
+import com.example.petlink.data.model.SpeciesReq
+import com.example.petlink.data.model.BreedReq
 import com.example.petlink.data.model.UserResponse
 import com.example.petlink.data.model.TestResult
 import okhttp3.MultipartBody
@@ -41,7 +43,9 @@ interface PetLinkApi {
         @Query("price_max") priceMax: Double? = null,
         @Query("is_hypoallergenic") isHypoallergenic: Boolean? = null,
         @Query("child_friendly") childFriendly: Boolean? = null,
-        @Query("space_requirements") spaceRequirements: String? = null
+        @Query("space_requirements") spaceRequirements: String? = null,
+        @Query("is_sterilized") isSterilized: Boolean? = null,
+        @Query("has_vaccinations") hasVaccinations: Boolean? = null
     ): Call<List<AnimalReq>>
 
     @GET("api/animal_photos/")
@@ -49,6 +53,12 @@ interface PetLinkApi {
 
     @GET("api/statuses/")
     fun getStatuses(): Call<List<StatusReq>>
+
+    @GET("api/species/")
+    fun getSpecies(): Call<List<SpeciesReq>>
+
+    @GET("api/breeds/")
+    fun getBreeds(): Call<List<BreedReq>>
 
     @GET("api/auth/user/")
     fun me(@Header("Authorization") authHeader: String): Call<UserResponse>

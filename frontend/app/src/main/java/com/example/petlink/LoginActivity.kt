@@ -26,12 +26,12 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
 
-//        val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
-//        if (sharedPreferences.getBoolean("is_logged_in", false)) {
-//            startActivity(Intent(this, MainActivity::class.java))
-//            finish()
-//            return
-//        }
+        val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
+        if (sharedPreferences.getBoolean("is_logged_in", false)) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+            return
+        }
 
         userEmail = findViewById(R.id.user_login_auth)
         userPass = findViewById(R.id.user_pass_auth)

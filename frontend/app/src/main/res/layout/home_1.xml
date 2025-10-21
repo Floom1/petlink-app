@@ -30,7 +30,6 @@
                 android:textColor="#000000"
                 android:textSize="@dimen/title_text_size" />
 
-            <!-- Фильтры -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -38,7 +37,6 @@
                 android:layout_marginBottom="@dimen/spacing_md"
                 android:orientation="vertical">
 
-                <!-- Кнопка фильтров -->
                 <Button
                     android:id="@+id/btn_filters"
                     android:layout_width="match_parent"
@@ -55,7 +53,6 @@
                     app:backgroundTint="@null"
                     android:textStyle="bold" />
 
-                <!-- Панель фильтров (скрываемая) -->
                 <LinearLayout
                     android:id="@+id/filters_panel"
                     android:layout_width="match_parent"
@@ -65,7 +62,6 @@
                     android:padding="@dimen/spacing_md"
                     android:visibility="gone">
 
-                    <!-- Порода -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -88,7 +84,6 @@
                             android:background="@drawable/edittext_rounded_border" />
                     </LinearLayout>
 
-                    <!-- Вид -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -111,7 +106,6 @@
                             android:background="@drawable/edittext_rounded_border" />
                     </LinearLayout>
 
-                    <!-- Возраст -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -134,7 +128,6 @@
                             android:background="@drawable/edittext_rounded_border" />
                     </LinearLayout>
 
-                    <!-- Пол -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -157,7 +150,6 @@
                             android:background="@drawable/edittext_rounded_border" />
                     </LinearLayout>
 
-                    <!-- Цена -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -165,22 +157,99 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
                             android:text="Цена:"
                             android:textColor="#333333"
                             android:textSize="14sp" />
 
-                        <Spinner
-                            android:id="@+id/spinner_price"
+                        <EditText
+                            android:id="@+id/edit_price_min"
                             android:layout_width="0dp"
                             android:layout_height="40dp"
-                            android:layout_weight="2"
-                            android:background="@drawable/edittext_rounded_border" />
+                            android:layout_weight="1"
+                            android:inputType="numberDecimal"
+                            android:hint="От"
+                            android:padding="8dp"
+                            android:background="@drawable/edittext_rounded_border"
+                            android:textColor="#000"
+                            android:textColorHint="#6a6a6a" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="8dp"
+                            android:text="—"
+                            android:textColor="#333333"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/edit_price_max"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:inputType="numberDecimal"
+                            android:hint="До"
+                            android:padding="8dp"
+                            android:background="@drawable/edittext_rounded_border"
+                            android:textColor="#000"
+                            android:textColorHint="#6a6a6a" />
                     </LinearLayout>
 
-                    <!-- Кнопки управления фильтрами -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/spacing_sm"
+                        android:orientation="vertical">
+
+                        <CheckBox
+                            android:id="@+id/cb_sterilized"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Стерилизовано" />
+
+                        <CheckBox
+                            android:id="@+id/cb_vaccinated"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Есть прививки" />
+
+                        <CheckBox
+                            android:id="@+id/cb_hypo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Гипоаллергенное" />
+
+                        <CheckBox
+                            android:id="@+id/cb_child_friendly"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Дружелюбно к детям" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/spacing_sm"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Требования к пространству:"
+                                android:textColor="#333333"
+                                android:textSize="14sp" />
+
+                            <Spinner
+                                android:id="@+id/spinner_space"
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:layout_weight="2"
+                                android:background="@drawable/edittext_rounded_border" />
+                        </LinearLayout>
+                    </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
