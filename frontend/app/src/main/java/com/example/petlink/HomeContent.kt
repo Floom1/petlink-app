@@ -14,6 +14,7 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.example.petlink.data.model.AnimalPhotoReq
 import com.example.petlink.data.model.AnimalReq
+import com.example.petlink.data.model.BreedReq
 import com.example.petlink.data.model.StatusReq
 import com.example.petlink.util.RetrofitClient
 import retrofit2.Call
@@ -53,6 +54,7 @@ class HomeContent {
         val spinnerSpace = (grid.parent as? View)?.rootView?.findViewById<Spinner>(R.id.spinner_space)
         val editPriceMin = (grid.parent as? View)?.rootView?.findViewById<android.widget.EditText>(R.id.edit_price_min)
         val editPriceMax = (grid.parent as? View)?.rootView?.findViewById<android.widget.EditText>(R.id.edit_price_max)
+        val btnTestRecommendations = (grid.parent as? View)?.rootView?.findViewById<Button>(R.id.btn_test_recommendations)
 
         if (!filtersInitialized) {
             spinnerGender?.adapter = ArrayAdapter(
@@ -100,6 +102,9 @@ class HomeContent {
 
             btnFilters?.setOnClickListener {
                 if (filtersPanel?.visibility == View.VISIBLE) filtersPanel.visibility = View.GONE else filtersPanel?.visibility = View.VISIBLE
+            }
+            btnTestRecommendations?.setOnClickListener {
+                loadRecommendedAnimals(grid, context)
             }
             btnClear?.setOnClickListener {
                 fetchAndRender(grid, context, null, null, null, null, null, null, null, null, null, null, null, null)
@@ -289,5 +294,172 @@ class HomeContent {
 
             grid.addView(v)
         }
+    }
+
+    private fun loadRecommendedAnimals(grid: GridLayout, context: Context) {
+        val sharedPref = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
+        val token = sharedPref.getString("auth_token", null)
+        if (token == null) {
+            Toast.makeText(context, "Необходимо авторизоваться", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val authHeader = "Token $token"
+
+        RetrofitClient.apiService.getMyRecommendations(authHeader).enqueue(object : Callback<Map<String, Any>> {
+            override fun onResponse(call: Call<Map<String, Any>>, response: Response<Map<String, Any>>) {
+                if (response.isSuccessful) {
+                    val recommendationsData = response.body()
+                    val recommendationsList = recommendationsData?.get("recommendations") as? List<Map<String, Any>>
+                    if (!recommendationsList.isNullOrEmpty()) {
+                        val firstRecommendation = recommendationsList[0]
+                        val templateId = firstRecommendation["template"]
+                        val message = firstRecommendation["message"]
+                        val animals = firstRecommendation["animals"] as? List<String>
+
+                        val animalsList = animals?.joinToString(", ") ?: "Не указаны"
+                        val fullMessage = "Шаблон #$templateId\n$message\n\nРекомендуемые породы: $animalsList"
+
+                        val dialog = android.app.AlertDialog.Builder(context)
+                            .setMessage(fullMessage)
+                            .setPositiveButton("ОК") { dialog, _ ->
+                                dialog.dismiss()
+                                // После закрытия диалога загружаем животных
+                                if (!animals.isNullOrEmpty()) {
+                                    loadAnimalsByBreeds(grid, context, animals)
+                                } else {
+                                    loadAllAnimals(grid, context)
+                                }
+                            }
+                            .setCancelable(false)
+                            .create()
+                        dialog.show()
+
+                    } else {
+                        Toast.makeText(context, "Рекомендации не найдены", Toast.LENGTH_SHORT).show()
+                        loadAllAnimals(grid, context)
+                    }
+                } else {
+                    Toast.makeText(context, "Ошибка загрузки рекомендаций: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    loadAllAnimals(grid, context)
+                }
+            }
+
+            override fun onFailure(call: Call<Map<String, Any>>, t: Throwable) {
+                Toast.makeText(context, "Ошибка сети: ${t.message}", Toast.LENGTH_SHORT).show()
+                loadAllAnimals(grid, context)
+            }
+        })
+    }
+
+    private fun loadAnimalsByBreeds(grid: GridLayout, context: Context, recommendedBreeds: List<String>) {
+        RetrofitClient.apiService.getBreeds().enqueue(object : Callback<List<BreedReq>> {
+            override fun onResponse(call: Call<List<BreedReq>>, response: Response<List<BreedReq>>) {
+                if (response.isSuccessful) {
+                    val allBreeds = response.body() ?: emptyList()
+                    val breedIds = allBreeds.filter { breed ->
+                        recommendedBreeds.any { recommendedBreed ->
+                            breed.name.equals(recommendedBreed, ignoreCase = true)
+                        }
+                    }.map { it.id }
+
+                    if (breedIds.isNotEmpty()) {
+                        loadAnimalsByBreedIds(grid, context, breedIds)
+                    } else {
+                        renderGridWithPhotos(grid, context, emptyList(), emptyList(), emptyList())
+                        Toast.makeText(context, "Животные по рекомендованным породам не найдены", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(context, "Ошибка загрузки пород: ${response.code()}", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<BreedReq>>, t: Throwable) {
+                Toast.makeText(context, "Ошибка сети при загрузке пород: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun loadAnimalsByBreedIds(grid: GridLayout, context: Context, breedIds: List<Int>) {
+        var animalsList = listOf<AnimalReq>()
+        var photosList = listOf<AnimalPhotoReq>()
+        var statusesList = listOf<StatusReq>()
+        var statusesLoaded = false
+        var animalsLoaded = false
+        var photosLoaded = false
+
+        fun tryRender() {
+            if (animalsLoaded && photosLoaded && statusesLoaded) {
+                renderGridWithPhotos(grid, context, animalsList, photosList, statusesList)
+            }
+        }
+
+        val animalCalls = breedIds.map { breedId ->
+            RetrofitClient.apiService.getAnimals(breedId = breedId)
+        }
+
+        var completedCalls = 0
+        val allAnimals = mutableListOf<AnimalReq>()
+
+        animalCalls.forEach { call ->
+            call.enqueue(object : Callback<List<AnimalReq>> {
+                override fun onResponse(call: Call<List<AnimalReq>>, response: Response<List<AnimalReq>>) {
+                    if (response.isSuccessful) {
+                        val animals = response.body() ?: emptyList()
+                        allAnimals.addAll(animals)
+                    }
+                    completedCalls++
+                    if (completedCalls == animalCalls.size) {
+                        animalsList = allAnimals
+                        animalsLoaded = true
+                        tryRender()
+                    }
+                }
+
+                override fun onFailure(call: Call<List<AnimalReq>>, t: Throwable) {
+                    completedCalls++
+                    if (completedCalls == animalCalls.size) {
+                        animalsList = allAnimals
+                        animalsLoaded = true
+                        tryRender()
+                    }
+                }
+            })
+        }
+
+        RetrofitClient.apiService.getAnimalPhotos().enqueue(object: Callback<List<AnimalPhotoReq>> {
+            override fun onResponse(call: Call<List<AnimalPhotoReq>>, response: Response<List<AnimalPhotoReq>>) {
+                if (!response.isSuccessful) {
+                    Toast.makeText(context, "Ошибка загрузки: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    return
+                }
+                photosList = response.body().orEmpty()
+                photosLoaded = true
+                tryRender()
+            }
+
+            override fun onFailure(call: Call<List<AnimalPhotoReq>>, t: Throwable) {
+                Toast.makeText(context, "Сеть недоступна: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        RetrofitClient.apiService.getStatuses().enqueue(object: Callback<List<StatusReq>> {
+            override fun onResponse(call: Call<List<StatusReq>>, response: Response<List<StatusReq>>) {
+                if (!response.isSuccessful) {
+                    Toast.makeText(context, "Ошибка загрузки: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    return
+                }
+                statusesList = response.body().orEmpty()
+                statusesLoaded = true
+                tryRender()
+            }
+
+            override fun onFailure(call: Call<List<StatusReq>>, t: Throwable) {
+                Toast.makeText(context, "Сеть недоступна: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun loadAllAnimals(grid: GridLayout, context: Context) {
+        fetchAndRender(grid, context, null, null, null, null, null, null, null, null, null, null, null, null)
     }
 }

@@ -83,4 +83,14 @@ interface PetLinkApi {
         @Body testResult: TestResult
     ): Call<TestResult>
 
+    @GET("api/tests/my_recommendations/")
+    fun getMyRecommendations(
+        @Header("Authorization") authHeader: String
+    ): Call<Map<String, Any>>
+
+    @GET("api/tests/recommended_animals/")
+    fun getRecommendedAnimals(
+        @Header("Authorization") authHeader: String
+    ): Call<List<AnimalReq>>
+
 }

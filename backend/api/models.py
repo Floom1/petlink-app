@@ -166,6 +166,190 @@ class TestResult(models.Model):
     def __str__(self):
         return f"Результаты теста для {self.user.email}"
 
+    def get_recommendations(self):
+        """
+        Генерирует рекомендации на основе результатов теста
+        """
+        is_apartment = self.residence_type == 'apartment'
+        is_private_house = self.residence_type == 'private'
+        little_time = self.weekday_time == 'lt4'
+        much_time = self.weekday_time == 'gt8'
+        no_experience = self.pet_experience == 'none'
+        has_experience = self.pet_experience in ['had_before', 'now']
+
+        recommendations = []
+
+        # Проверяем комбинации с высоким приоритетом первыми
+
+        # Шаблон 14: Планирует переезд + Есть аллергия (высший приоритет)
+        if self.planned_move and self.has_allergies:
+            recommendations.append({
+                'template': 14,
+                'message': "Рекомендуем хорьков или кошек, которые не вызывают аллергию и легко адаптируются к новым условиям.",
+                'animals': ['Сфинкс', 'Хорек', 'Корниш-рекс', 'Девон-рекс', 'Балийская кошка'],
+                'filters': {
+                    'is_hypoallergenic': True
+                }
+            })
+
+        # Шаблон 3: Планирует переезд (высокий приоритет)
+        elif self.planned_move:
+            recommendations.append({
+                'template': 3,
+                'message': "Внимание: вы планируете переезд в ближайшие 6 месяцев. Рекомендуем подождать с усыновлением до завершения переезда. Если хотите усыновить сейчас, рассмотрите кошек, которые дружелюбны к детям и легко адаптируются к новым условиям.",
+                'animals': ['Рэгдолл', 'Мейн-кун', 'Сибирская кошка', 'Британская короткошерстная кошка', 'Скоттиш-фолд'],
+                'filters': {
+                    'child_friendly': True if self.has_children else None
+                }
+            })
+
+        # Шаблон 1: Квартира, мало времени, нет опыта, есть аллергия (комплексный случай)
+        elif is_apartment and little_time and no_experience and self.has_allergies:
+            recommendations.append({
+                'template': 1,
+                'message': "Рекомендуем хорьков или кошек, которые не вызывают аллергию и не требуют много времени и могут оставаться одни в течение дня.",
+                'animals': ['Сфинкс', 'Корниш-рекс', 'Девон-рекс', 'Хорек (Стандартный)', 'Балийская кошка'],
+                'filters': {
+                    'is_hypoallergenic': True,
+                    'space_requirements': 'low'
+                }
+            })
+
+        # Шаблон 4: Есть аллергия на шерсть животных (высокий приоритет)
+        elif self.has_allergies:
+            recommendations.append({
+                'template': 4,
+                'message': "Рекомендуем хорьков или кошек, которые не вызывают аллергию.",
+                'animals': ['Сфинкс', 'Корниш-рекс', 'Девон-рекс', 'Балийская кошка', 'Ориентальная кошка'],
+                'filters': {
+                    'is_hypoallergenic': True
+                }
+            })
+
+        # Шаблон 2: Дом с двором, много времени, есть дети
+        elif is_private_house and much_time and self.has_children:
+            recommendations.append({
+                'template': 2,
+                'message': "Подойдут спокойные породы собак или кошки, которые дружелюбны к детям. Собаки должны быть приучены к лотку и иметь дружелюбный характер.",
+                'animals': ['Лабрадор-ретривер', 'Золотистый ретривер', 'Мейн-кун', 'Рэгдолл', 'Бернский зенненхунд'],
+                'filters': {
+                    'child_friendly': True,
+                    'space_requirements': 'high'
+                }
+            })
+
+        # Шаблон 5: Есть дети, много времени, опыт владения
+        elif self.has_children and much_time and has_experience:
+            recommendations.append({
+                'template': 5,
+                'message': "Подойдут спокойные породы собак или кошки, которые дружелюбны к детям.",
+                'animals': ['Лабрадор-ретривер', 'Золотистый ретривер', 'Мейн-кун', 'Рэгдолл', 'Бернский зенненхунд'],
+                'filters': {
+                    'child_friendly': True
+                }
+            })
+
+        # Шаблон 6: Квартира, много времени, нет аллергии
+        elif is_apartment and much_time and not self.has_allergies:
+            recommendations.append({
+                'template': 6,
+                'message': "Рекомендуем кошек, которые не требуют много внимания и могут быть активными, но при этом не требуют слишком много времени на уход.",
+                'animals': ['Сиамская кошка', 'Персидская кошка', 'Британская короткошерстная кошка', 'Рэгдолл', 'Мейн-кун'],
+                'filters': {
+                    'space_requirements': 'medium'
+                }
+            })
+
+        # Шаблон 7: Квартира, мало времени, опыт владения (но нет аллергии)
+        elif is_apartment and little_time and has_experience and not self.has_allergies:
+            recommendations.append({
+                'template': 7,
+                'message': "Рекомендуем хорьков или кошек с дружелюбным характером, подходящие для маленьких помещений.",
+                'animals': ['Хорек (Стандартный)', 'Сиамская кошка', 'Девон-рекс', 'Корниш-рекс', 'Сфинкс'],
+                'filters': {
+                    'space_requirements': 'low'
+                }
+            })
+
+        # Шаблон 8: Дом с двором, мало времени, нет аллергии
+        elif is_private_house and little_time and not self.has_allergies:
+            recommendations.append({
+                'template': 8,
+                'message': "Собаки подходят, но с ограничением на время. Рекомендуем собак с низкими требованиями к прогулкам.",
+                'animals': ['Лабрадор-ретривер', 'Немецкая овчарка', 'Бернский зенненхунд', 'Кокер-спаниель', 'Ши-тцу'],
+                'filters': {
+                    'space_requirements': 'high'
+                }
+            })
+
+        # Шаблон 9: Квартира, много времени, есть аллергия
+        elif is_apartment and much_time and self.has_allergies:
+            recommendations.append({
+                'template': 9,
+                'message': "Рекомендуем хорьков или кошек, которые не вызывают аллергию.",
+                'animals': ['Хорек (Стандартный)', 'Сфинкс', 'Корниш-рекс', 'Девон-рекс', 'Балийская кошка'],
+                'filters': {
+                    'is_hypoallergenic': True,
+                    'space_requirements': 'low'
+                }
+            })
+
+        # Шаблон 10: Квартира, мало времени, нет опыта, нет аллергии
+        elif is_apartment and little_time and no_experience and not self.has_allergies:
+            recommendations.append({
+                'template': 10,
+                'message': "Рекомендуем кошек, которые не требуют много времени и могут оставаться одни в течение дня. Избегайте собак, требующих частых прогулок.",
+                'animals': ['Британская короткошерстная кошка', 'Мейн-кун', 'Рэгдолл', 'Сибирская кошка', 'Скоттиш-фолд'],
+                'filters': {
+                    'space_requirements': 'low',
+                    'child_friendly': True if self.has_children else None
+                }
+            })
+
+        # Шаблон 11: Нет опыта, дом с двором, много времени
+        elif no_experience and is_private_house and much_time:
+            recommendations.append({
+                'template': 11,
+                'message': "Рекомендуем собак, которые дружелюбны и легко приучаются к новым условиям.",
+                'animals': ['Лабрадор-ретривер', 'Золотистый ретривер', 'Бернский зенненхунд', 'Колли', 'Пудель'],
+                'filters': {
+                    'space_requirements': 'high'
+                }
+            })
+
+        # Шаблон 12: Нет аллергии, квартира, много времени
+        elif not self.has_allergies and is_apartment and much_time:
+            recommendations.append({
+                'template': 12,
+                'message': "Кошки идеальны для квартиры, они не требуют много внимания и легко адаптируются к новому окружению.",
+                'animals': ['Сиамская кошка', 'Персидская кошка', 'Британская короткошерстная кошка', 'Рэгдолл', 'Мейн-кун'],
+                'filters': {
+                    'space_requirements': 'medium'
+                }
+            })
+
+        # Шаблон 13: Квартира, много времени, опыт владения
+        elif is_apartment and much_time and has_experience:
+            recommendations.append({
+                'template': 13,
+                'message': "Собаки и кошки будут хорошо чувствовать себя в доме без двора, если проводить достаточное время с ними.",
+                'animals': ['Лабрадор-ретривер', 'Сиамская кошка', 'Мейн-кун', 'Золотистый ретривер', 'Сибирская кошка'],
+                'filters': {
+                    'space_requirements': 'medium'
+                }
+            })
+
+        # Общая рекомендация (резервный шаблон)
+        if not recommendations:
+            recommendations.append({
+                'template': 15,
+                'message': "Лабрадоры - подходят для большинства условий. Рекомендуем также кошек и хорьков.",
+                'animals': ['Лабрадор-ретривер', 'Сиамская кошка', 'Хорек', 'Британская короткошерстная кошка', 'Золотистый ретривер'],
+                'filters': {}
+            })
+
+        return recommendations
+
 # Модели заявок
 class AnimalApplication(models.Model):
     STATUS_CHOICES = [

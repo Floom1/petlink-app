@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#DDF8FC"
+    android:background="#00E0D5D5"
     android:orientation="vertical">
 
     <ScrollView
@@ -36,22 +36,56 @@
                 android:layout_marginHorizontal="@dimen/spacing_md"
                 android:layout_marginBottom="@dimen/spacing_md"
                 android:orientation="vertical">
-
-                <Button
-                    android:id="@+id/btn_filters"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/spacing_sm"
-                    android:background="@drawable/btn_stroke_black"
-                    android:drawableStart="@mipmap/filter"
-                    android:drawablePadding="8dp"
-                    android:gravity="center"
-                    android:text="Фильтры"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:backgroundTint="@null"
-                    app:backgroundTint="@null"
-                    android:textStyle="bold" />
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="@dimen/spacing_sm">
+
+                        <Button
+                            android:id="@+id/btn_filters"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/btn_stroke_black"
+                            android:backgroundTint="@null"
+                            android:gravity="center"
+                            android:text="Фильтры"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            app:backgroundTint="@null" />
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_alignStart="@id/btn_filters"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="12dp"
+                            android:src="@mipmap/filter_light" />
+
+                    </RelativeLayout>
+
+                    <Button
+                        android:id="@+id/btn_test_recommendations"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_stroke_black"
+                        android:backgroundTint="@null"
+                        android:gravity="center"
+                        android:text="По тесту"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@null" />
+
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/filters_panel"
@@ -169,10 +203,10 @@
                             android:layout_width="0dp"
                             android:layout_height="40dp"
                             android:layout_weight="1"
-                            android:inputType="numberDecimal"
-                            android:hint="От"
-                            android:padding="8dp"
                             android:background="@drawable/edittext_rounded_border"
+                            android:hint="От"
+                            android:inputType="numberDecimal"
+                            android:padding="8dp"
                             android:textColor="#000"
                             android:textColorHint="#6a6a6a" />
 
@@ -189,10 +223,10 @@
                             android:layout_width="0dp"
                             android:layout_height="40dp"
                             android:layout_weight="1"
-                            android:inputType="numberDecimal"
-                            android:hint="До"
-                            android:padding="8dp"
                             android:background="@drawable/edittext_rounded_border"
+                            android:hint="До"
+                            android:inputType="numberDecimal"
+                            android:padding="8dp"
                             android:textColor="#000"
                             android:textColorHint="#6a6a6a" />
                     </LinearLayout>
@@ -262,11 +296,11 @@
                             android:layout_marginEnd="@dimen/spacing_sm"
                             android:layout_weight="1"
                             android:background="@drawable/btn_stroke_black"
+                            android:backgroundTint="@null"
                             android:text="Применить"
                             android:textColor="#FFFFFF"
-                            android:backgroundTint="@null"
-                            app:backgroundTint="@null"
-                            android:textSize="14sp" />
+                            android:textSize="14sp"
+                            app:backgroundTint="@null" />
 
                         <Button
                             android:id="@+id/btn_clear_filters"
@@ -275,11 +309,11 @@
                             android:layout_marginStart="@dimen/spacing_sm"
                             android:layout_weight="1"
                             android:background="@drawable/btn_stroke_gray"
+                            android:backgroundTint="@null"
                             android:text="Сбросить"
                             android:textColor="#000000"
-                            android:backgroundTint="@null"
-                            app:backgroundTint="@null"
-                            android:textSize="14sp" />
+                            android:textSize="14sp"
+                            app:backgroundTint="@null" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>

@@ -10,6 +10,7 @@ from .serializers import *
 from django.core.files.storage import FileSystemStorage
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Q
+from rest_framework.decorators import action
 
 
 class AnimalViewSet(viewsets.ModelViewSet):
@@ -122,6 +123,56 @@ class ServicePhotoViewSet(viewsets.ModelViewSet):
 class TestResultViewSet(viewsets.ModelViewSet):
     queryset = TestResult.objects.all()
     serializer_class = TestResultSerializer
+
+    @action(detail=True, methods=['get'], permission_classes=[IsAuthenticated])
+    def recommendations(self, request, pk=None):
+        test_result = self.get_object()
+        recommendations = test_result.get_recommendations()
+        return Response({
+            'recommendations': recommendations
+        })
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_recommendations(self, request):
+        try:
+            test_result = TestResult.objects.get(user=request.user)
+            recommendations = test_result.get_recommendations()
+            return Response({
+                'recommendations': recommendations
+            })
+        except TestResult.DoesNotExist:
+            return Response({
+                'error': 'Результаты теста не найдены'
+            }, status=404)
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def recommended_animals(self, request):
+        try:
+            test_result = TestResult.objects.get(user=request.user)
+            recommendations = test_result.get_recommendations()
+
+            if recommendations:
+                filters = recommendations[0].get('filters', {})
+            else:
+                filters = {}
+
+            qs = Animal.objects.filter(status__is_available=True)
+
+            if 'space_requirements' in filters and filters['space_requirements']:
+                qs = qs.filter(space_requirements=filters['space_requirements'])
+
+            if 'child_friendly' in filters and filters['child_friendly'] is not None:
+                qs = qs.filter(child_friendly=filters['child_friendly'])
+
+            if 'is_hypoallergenic' in filters and filters['is_hypoallergenic'] is not None:
+                qs = qs.filter(is_hypoallergenic=filters['is_hypoallergenic'])
+
+            serializer = AnimalSerializer(qs, many=True)
+            return Response(serializer.data)
+        except TestResult.DoesNotExist:
+            return Response({
+                'error': 'Результаты теста не найдены'
+            }, status=404)
 
 
 class AnimalApplicationViewSet(viewsets.ModelViewSet):
