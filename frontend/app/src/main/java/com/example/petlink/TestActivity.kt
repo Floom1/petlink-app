@@ -5,6 +5,7 @@ import android.widget.Button
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.example.petlink.data.model.TestResult
 import com.example.petlink.util.RetrofitClient
@@ -17,6 +18,13 @@ class TestActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test)
+
+        // Блокируем кнопку "назад"
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                Toast.makeText(this@TestActivity, "Пожалуйста, пройдите тест", Toast.LENGTH_SHORT).show()
+            }
+        })
 
         findViewById<Button>(R.id.button_submit_test)?.setOnClickListener {
             submitTest()
@@ -58,6 +66,10 @@ class TestActivity : AppCompatActivity() {
                 override fun onResponse(call: Call<TestResult>, response: Response<TestResult>) {
                     if (response.isSuccessful) {
                         Toast.makeText(this@TestActivity, "Тест успешно сохранён!", Toast.LENGTH_SHORT).show()
+                        // После успешного прохождения теста переходим на главную
+                        val intent = android.content.Intent(this@TestActivity, MainActivity::class.java)
+                        intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
                         finish()
                     } else {
                         Toast.makeText(this@TestActivity, "Ошибка сохранения теста", Toast.LENGTH_SHORT).show()

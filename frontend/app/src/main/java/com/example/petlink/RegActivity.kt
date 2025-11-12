@@ -23,13 +23,6 @@ class RegActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reg)
 
-//        val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
-//        if (sharedPreferences.getBoolean("is_logged_in", false)) {
-//            startActivity(Intent(this, MainActivity::class.java))
-//            finish()
-//            return
-//        }
-
         userLogin = findViewById(R.id.user_login)
         userEmail = findViewById(R.id.user_email)
         userPassword = findViewById(R.id.user_password)
@@ -72,16 +65,48 @@ class RegActivity : AppCompatActivity() {
         RetrofitClient.apiService.register(registrationRequest).enqueue(object : retrofit2.Callback<AuthResponse> {
             override fun onResponse(call: retrofit2.Call<AuthResponse>, response: retrofit2.Response<AuthResponse>) {
                 if (response.isSuccessful) {
-                    val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
-                    val editor = sharedPreferences.edit()
-                    editor.putString("auth_token", response.body()?.token)
-                    editor.putBoolean("is_logged_in", true)
-                    editor.apply()
+                    val authResponse = response.body()
+                    if (authResponse?.token != null) {
+                        val token = authResponse.token
+                        val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
+                        val editor = sharedPreferences.edit()
+                        editor.putString("auth_token", token)
+                        editor.putBoolean("is_logged_in", true)
+                        editor.apply()
 
-                    startActivity(Intent(this@RegActivity, LoginActivity::class.java))
-                    finish()
+                        // Получаем ID пользователя
+                        RetrofitClient.apiService.me("Token $token").enqueue(object: retrofit2.Callback<com.example.petlink.data.model.UserResponse> {
+                            override fun onResponse(call2: retrofit2.Call<com.example.petlink.data.model.UserResponse>, resp: retrofit2.Response<com.example.petlink.data.model.UserResponse>) {
+                                if (resp.isSuccessful) {
+                                    val id = resp.body()?.id ?: -1
+                                    val sp = getSharedPreferences("user_session", MODE_PRIVATE)
+                                    sp.edit().putInt("id", id).apply()
+                                }
+                                // После регистрации переходим к тесту
+                                startActivity(Intent(this@RegActivity, TestActivity::class.java))
+                                finish()
+                            }
+
+                            override fun onFailure(call2: retrofit2.Call<com.example.petlink.data.model.UserResponse>, t: Throwable) {
+                                // Переходим к тесту даже если не удалось получить ID
+                                startActivity(Intent(this@RegActivity, TestActivity::class.java))
+                                finish()
+                            }
+                        })
+                    } else {
+                        // Пользователь создан, но токен не получен (возможно, это отложенная активация)
+                        Toast.makeText(this@RegActivity, "Регистрация успешна. Пожалуйста, войдите в систему.", Toast.LENGTH_LONG).show()
+                        startActivity(Intent(this@RegActivity, LoginActivity::class.java))
+                        finish()
+                    }
                 } else {
-                    Toast.makeText(this@RegActivity, "Ошибка регистрации", Toast.LENGTH_LONG).show()
+                    // Детализируем ошибку
+                    val errorMessage = when (response.code()) {
+                        400 -> "Некорректные данные регистрации"
+                        409 -> "Пользователь с таким email уже существует"
+                        else -> "Ошибка регистрации: ${response.code()}"
+                    }
+                    Toast.makeText(this@RegActivity, errorMessage, Toast.LENGTH_LONG).show()
                 }
             }
 
