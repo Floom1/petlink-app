@@ -10,6 +10,7 @@ data class UserResponse(
     val email: String,
     val full_name: String,
     val is_shelter: Boolean,
+    val shelter_name: String?,
     val photo_url: String?,
     val phone: String?,
     val address: String?

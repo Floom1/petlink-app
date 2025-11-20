@@ -109,6 +109,14 @@ class AnimalPhotoViewSet(viewsets.ModelViewSet):
     queryset = AnimalPhoto.objects.all()
     serializer_class = AnimalPhotoSerializer
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        animal_id = request.query_params.get('animal_id', None)
+        if animal_id is not None:
+            queryset = queryset.filter(animal_id=animal_id)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all()

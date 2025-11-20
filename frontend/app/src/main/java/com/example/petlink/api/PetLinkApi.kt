@@ -9,8 +9,10 @@ import com.example.petlink.data.model.AnimalReq
 import com.example.petlink.data.model.StatusReq
 import com.example.petlink.data.model.SpeciesReq
 import com.example.petlink.data.model.BreedReq
-import com.example.petlink.data.model.UserResponse
 import com.example.petlink.data.model.TestResult
+import com.example.petlink.data.model.AnimalSimpleResponse
+import com.example.petlink.data.model.UserResponse
+
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -48,8 +50,14 @@ interface PetLinkApi {
         @Query("has_vaccinations") hasVaccinations: Boolean? = null
     ): Call<List<AnimalReq>>
 
+//    @GET("api/animal_photos/")
+//    fun getAnimalPhotos(): Call<List<AnimalPhotoReq>>
+
     @GET("api/animal_photos/")
-    fun getAnimalPhotos(): Call<List<AnimalPhotoReq>>
+    fun getAnimalPhotos(@Query("animal_id") animalId: Long? = null): Call<List<AnimalPhotoReq>>
+
+    @GET("api/users/{id}/")
+    fun getUser(@Path("id") id: Long): Call<UserResponse>
 
     @GET("api/statuses/")
     fun getStatuses(): Call<List<StatusReq>>
@@ -59,6 +67,10 @@ interface PetLinkApi {
 
     @GET("api/breeds/")
     fun getBreeds(): Call<List<BreedReq>>
+
+    @GET("api/breeds/{id}/")
+    fun getBreed(@Path("id") id: Long): Call<BreedReq>
+
 
     @GET("api/auth/user/")
     fun me(@Header("Authorization") authHeader: String): Call<UserResponse>
@@ -92,5 +104,8 @@ interface PetLinkApi {
     fun getRecommendedAnimals(
         @Header("Authorization") authHeader: String
     ): Call<List<AnimalReq>>
+
+    @GET("api/animals/{id}/")
+    fun getAnimalDetail(@Path("id") id: Int): Call<AnimalSimpleResponse>
 
 }

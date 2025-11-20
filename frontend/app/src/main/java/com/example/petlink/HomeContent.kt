@@ -1,6 +1,7 @@
 package com.example.petlink
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -275,6 +276,12 @@ class HomeContent {
             val image = v.findViewById<ImageView>(R.id.ad_image)
             val status = v.findViewById<TextView>(R.id.ad_badge)
 
+            v.setOnClickListener {
+                val intent = Intent(context, AnimalDetailActivity::class.java)
+                intent.putExtra("animal_id", animal.id)
+                context.startActivity(intent)
+            }
+
             title.text = animal.name ?: "Без названия"
             price.text = animal.price.toString()
 
@@ -294,6 +301,7 @@ class HomeContent {
 
             grid.addView(v)
         }
+
     }
 
     private fun loadRecommendedAnimals(grid: GridLayout, context: Context) {
