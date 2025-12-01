@@ -61,6 +61,12 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(android.content.Intent(this, TestActivity::class.java))
         }
 
+        findViewById<Button>(R.id.button_my_apps)?.setOnClickListener {
+            val intent = Intent(this, ApplicationsActivity::class.java)
+            intent.putExtra("role", "buyer")
+            startActivity(intent)
+        }
+
         loadUser()
     }
 

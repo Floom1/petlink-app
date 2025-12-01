@@ -24,6 +24,10 @@ import com.example.petlink.data.model.AnimalSimpleResponse
 import com.example.petlink.data.model.BreedReq
 import com.example.petlink.data.model.UserResponse
 import com.example.petlink.util.RetrofitClient
+import com.example.petlink.data.model.AnimalApplication
+import com.example.petlink.data.model.AnimalApplicationCreate
+import android.text.InputFilter
+import org.json.JSONObject
 
 class AnimalDetailActivity : AppCompatActivity() {
 
@@ -46,6 +50,8 @@ class AnimalDetailActivity : AppCompatActivity() {
     private var animalId: Long = 0
     private var isFavorite: Boolean = false
     private var api: PetLinkApi? = null
+    private var sellerUser: UserResponse? = null
+    private var currentUser: UserResponse? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +69,7 @@ class AnimalDetailActivity : AppCompatActivity() {
 
         // Initialize Retrofit
         api = RetrofitClient.apiService
+        fetchCurrentUser()
         // Load animal details
         loadAnimalDetails()
 
@@ -133,6 +140,19 @@ class AnimalDetailActivity : AppCompatActivity() {
         })
     }
 
+    private fun fetchCurrentUser() {
+        val token = sharedPreferences.getString("auth_token", null) ?: return
+        RetrofitClient.apiService.me("Token $token").enqueue(object: Callback<UserResponse> {
+            override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
+                if (response.isSuccessful) {
+                    currentUser = response.body()
+                }
+            }
+
+            override fun onFailure(call: Call<UserResponse>, t: Throwable) { }
+        })
+    }
+
     private fun loadAdditionalData(animal: AnimalSimpleResponse) {
         var userLoaded = false
         var breedLoaded = false
@@ -158,6 +178,7 @@ class AnimalDetailActivity : AppCompatActivity() {
                 override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
                     if (response.isSuccessful) {
                         user = response.body()
+                        sellerUser = user
                     }
                     userLoaded = true
                     tryDisplay()
@@ -438,32 +459,137 @@ class AnimalDetailActivity : AppCompatActivity() {
     }
 
     private fun handleApplyButtonClick() {
-        // Check if compatibility test is completed
-        val testCompleted = sharedPreferences.getBoolean("test_completed", false)
-
-        if (!testCompleted) {
-            // Show dialog suggesting to complete the test
-            AlertDialog.Builder(this)
-                .setTitle("Пройдите тест совместимости")
-                .setMessage("Для подачи заявки необходимо пройти тест совместимости. Перейти к тесту?")
-                .setPositiveButton("Пройти тест") { _, _ ->
-                    // Navigate to test activity
-                    val intent = Intent(this, TestActivity::class.java)
-                    startActivity(intent)
-                }
-                .setNegativeButton("Отмена", null)
-                .show()
-        } else {
-            // Show confirmation dialog
-            AlertDialog.Builder(this)
-                .setTitle("Подать заявку")
-                .setMessage("Вы уверены, что хотите подать заявку на это животное?")
-                .setPositiveButton("Да") { _, _ ->
-                    // TODO: Implement API call to submit application
-                    Toast.makeText(this, "Заявка отправлена!", Toast.LENGTH_SHORT).show()
-                }
-                .setNegativeButton("Отмена", null)
-                .show()
+        val token = sharedPreferences.getString("auth_token", null)
+        if (token.isNullOrEmpty()) {
+            Toast.makeText(this, "Требуется вход", Toast.LENGTH_SHORT).show()
+            return
         }
+
+        RetrofitClient.apiService.getMyRecommendations("Token $token").enqueue(object : Callback<Map<String, Any>> {
+            override fun onResponse(call: Call<Map<String, Any>>, response: Response<Map<String, Any>>) {
+                if (response.isSuccessful) {
+                    // Предварительная проверка: есть ли уже активная заявка от текущего пользователя на это животное
+                    RetrofitClient.apiService.getAnimalApplications(
+                        "Token $token", role = "buyer", status = "submitted", animal = animalId.toInt()
+                    ).enqueue(object: Callback<List<AnimalApplication>> {
+                        override fun onResponse(callCheck: Call<List<AnimalApplication>>, respCheck: Response<List<AnimalApplication>>) {
+                            if (respCheck.isSuccessful) {
+                                val exists = (respCheck.body() ?: emptyList()).isNotEmpty()
+                                if (exists) {
+                                    Toast.makeText(this@AnimalDetailActivity, "У вас уже есть активная заявка на это животное", Toast.LENGTH_SHORT).show()
+                                    return
+                                }
+                            }
+
+                            val dialogView = layoutInflater.inflate(R.layout.dialog_application_confirm, null)
+                            val tvTitle = dialogView.findViewById<TextView>(R.id.tvDialogTitle)
+                            val tvAnimalNameConfirm = dialogView.findViewById<TextView>(R.id.tvAnimalNameConfirm)
+                            val tvSellerInfoConfirm = dialogView.findViewById<TextView>(R.id.tvSellerInfoConfirm)
+                            val tvBuyerNameConfirm = dialogView.findViewById<TextView>(R.id.tvBuyerNameConfirm)
+                            val tvBuyerPhoneConfirm = dialogView.findViewById<TextView>(R.id.tvBuyerPhoneConfirm)
+                            val tvBuyerAddressConfirm = dialogView.findViewById<TextView>(R.id.tvBuyerAddressConfirm)
+                            val etMessage = dialogView.findViewById<EditText>(R.id.etMessageConfirm)
+                            etMessage.filters = arrayOf(InputFilter.LengthFilter(500))
+
+                            tvTitle.text = "Подтвердите заявку на ${tvAnimalName.text}"
+                            tvAnimalNameConfirm.text = "Животное: ${tvAnimalName.text}"
+                            val seller = sellerUser
+                            tvSellerInfoConfirm.text = if (seller?.is_shelter == true) {
+                                "Продавец: Приют — ${seller.shelter_name ?: seller.full_name ?: "Не указано"}"
+                            } else {
+                                "Продавец: ${seller?.full_name ?: "Не указано"}"
+                            }
+                            currentUser?.let { me ->
+                                tvBuyerNameConfirm.text = "Покупатель: ${me.full_name}"
+                                tvBuyerPhoneConfirm.text = "Телефон: ${me.phone ?: "Не указан"}"
+                                tvBuyerAddressConfirm.text = "Адрес: ${me.address ?: "Не указан"}"
+                            }
+
+                            AlertDialog.Builder(this@AnimalDetailActivity)
+                                .setView(dialogView)
+                                .setPositiveButton("Подать заявку") { _, _ ->
+                                    val msg = etMessage.text?.toString()?.take(500)
+                                    RetrofitClient.apiService.createAnimalApplication(
+                                        "Token $token",
+                                        AnimalApplicationCreate(animalId.toInt(), msg)
+                                    ).enqueue(object : Callback<AnimalApplication> {
+                                        override fun onResponse(call2: Call<AnimalApplication>, resp: Response<AnimalApplication>) {
+                                            if (resp.isSuccessful) {
+                                                Toast.makeText(this@AnimalDetailActivity, "Заявка отправлена!", Toast.LENGTH_SHORT).show()
+                                            } else {
+                                                val err = try {
+                                                    val s = resp.errorBody()?.string()
+                                                    if (!s.isNullOrEmpty()) {
+                                                        val j = JSONObject(s)
+                                                        when {
+                                                            j.has("non_field_errors") -> j.getJSONArray("non_field_errors").optString(0)
+                                                            j.has("detail") -> j.optString("detail")
+                                                            j.has("status") -> j.optString("status")
+                                                            else -> null
+                                                        }
+                                                    } else null
+                                                } catch (e: Exception) { null }
+                                                val msg = err ?: "Ошибка отправки заявки. Возможно вы уже подали заявку."
+                                                Toast.makeText(this@AnimalDetailActivity, msg, Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+
+                                        override fun onFailure(call2: Call<AnimalApplication>, t: Throwable) {
+                                            Toast.makeText(this@AnimalDetailActivity, "Сеть недоступна: ${t.message}", Toast.LENGTH_SHORT).show()
+                                        }
+                                    })
+                                }
+                                .setNegativeButton("Отмена", null)
+                                .show()
+                        }
+
+                        override fun onFailure(callCheck: Call<List<AnimalApplication>>, t: Throwable) {
+                            // Если не смогли проверить, всё равно предложим форму, а дубль отловит сервер
+                            val dialogView = layoutInflater.inflate(R.layout.dialog_application_confirm, null)
+                            val etMessage = dialogView.findViewById<EditText>(R.id.etMessageConfirm)
+                            etMessage.filters = arrayOf(InputFilter.LengthFilter(500))
+                            AlertDialog.Builder(this@AnimalDetailActivity)
+                                .setView(dialogView)
+                                .setPositiveButton("Подать заявку") { _, _ ->
+                                    val msg = etMessage.text?.toString()?.take(500)
+                                    RetrofitClient.apiService.createAnimalApplication(
+                                        "Token $token",
+                                        AnimalApplicationCreate(animalId.toInt(), msg)
+                                    ).enqueue(object : Callback<AnimalApplication> {
+                                        override fun onResponse(call2: Call<AnimalApplication>, resp: Response<AnimalApplication>) {
+                                            if (resp.isSuccessful) {
+                                                Toast.makeText(this@AnimalDetailActivity, "Заявка отправлена!", Toast.LENGTH_SHORT).show()
+                                            } else {
+                                                Toast.makeText(this@AnimalDetailActivity, "Ошибка отправки заявки", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                        override fun onFailure(call2: Call<AnimalApplication>, t: Throwable) {
+                                            Toast.makeText(this@AnimalDetailActivity, "Сеть недоступна: ${t.message}", Toast.LENGTH_SHORT).show()
+                                        }
+                                    })
+                                }
+                                .setNegativeButton("Отмена", null)
+                                .show()
+                        }
+                    })
+                } else if (response.code() == 404) {
+                    AlertDialog.Builder(this@AnimalDetailActivity)
+                        .setTitle("Пройдите тест совместимости")
+                        .setMessage("Для подачи заявки необходимо пройти тест совместимости. Перейти к тесту?")
+                        .setPositiveButton("Пройти тест") { _, _ ->
+                            val intent = Intent(this@AnimalDetailActivity, TestActivity::class.java)
+                            startActivity(intent)
+                        }
+                        .setNegativeButton("Отмена", null)
+                        .show()
+                } else {
+                    Toast.makeText(this@AnimalDetailActivity, "Ошибка проверки теста", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Map<String, Any>>, t: Throwable) {
+                Toast.makeText(this@AnimalDetailActivity, "Сеть недоступна: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 }

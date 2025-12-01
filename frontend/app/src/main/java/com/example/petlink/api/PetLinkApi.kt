@@ -12,6 +12,8 @@ import com.example.petlink.data.model.BreedReq
 import com.example.petlink.data.model.TestResult
 import com.example.petlink.data.model.AnimalSimpleResponse
 import com.example.petlink.data.model.UserResponse
+import com.example.petlink.data.model.AnimalApplication
+import com.example.petlink.data.model.AnimalApplicationCreate
 
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -107,5 +109,33 @@ interface PetLinkApi {
 
     @GET("api/animals/{id}/")
     fun getAnimalDetail(@Path("id") id: Int): Call<AnimalSimpleResponse>
+
+    // Applications (animal)
+    @POST("api/animal_apps/")
+    fun createAnimalApplication(
+        @Header("Authorization") authHeader: String,
+        @Body body: AnimalApplicationCreate
+    ): Call<AnimalApplication>
+
+    @GET("api/animal_apps/")
+    fun getAnimalApplications(
+        @Header("Authorization") authHeader: String,
+        @Query("role") role: String? = null,
+        @Query("status") status: String? = null,
+        @Query("animal") animal: Int? = null
+    ): Call<List<AnimalApplication>>
+
+    @PATCH("api/animal_apps/{id}/")
+    fun updateAnimalApplicationStatus(
+        @Header("Authorization") authHeader: String,
+        @Path("id") id: Int,
+        @Body fields: Map<String, @JvmSuppressWildcards Any?>
+    ): Call<AnimalApplication>
+
+    @GET("api/animal_apps/{id}/")
+    fun getAnimalApplication(
+        @Header("Authorization") authHeader: String,
+        @Path("id") id: Int
+    ): Call<AnimalApplication>
 
 }

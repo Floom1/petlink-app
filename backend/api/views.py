@@ -186,6 +186,51 @@ class TestResultViewSet(viewsets.ModelViewSet):
 class AnimalApplicationViewSet(viewsets.ModelViewSet):
     queryset = AnimalApplication.objects.all()
     serializer_class = AnimalApplicationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = AnimalApplication.objects.all()
+
+        role = self.request.query_params.get('role')
+        status = self.request.query_params.get('status')
+        animal_id = self.request.query_params.get('animal')
+
+        if role == 'seller':
+            qs = qs.filter(animal__user=user)
+        elif role == 'buyer':
+            qs = qs.filter(user=user)
+        else:
+            qs = qs.filter(Q(user=user) | Q(animal__user=user))
+
+        if status in ('submitted', 'approved', 'rejected'):
+            qs = qs.filter(status=status)
+
+        if animal_id is not None:
+            try:
+                qs = qs.filter(animal_id=int(animal_id))
+            except ValueError:
+                pass
+
+        return qs.order_by('-created_at')
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # Менять статус может только владелец животного (продавец этого объявления)
+        if instance.animal.user_id != request.user.id:
+            return Response({'detail': 'Недостаточно прав'}, status=403)
+
+        new_status = request.data.get('status')
+        if new_status not in ('approved', 'rejected'):
+            return Response({'status': ['Можно менять только на approved или rejected']}, status=400)
+
+        if instance.status != 'submitted':
+            return Response({'status': ['Статус можно изменить только из submitted']}, status=400)
+
+        serializer = self.get_serializer(instance, data={'status': new_status}, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
 
 class ServiceApplicationViewSet(viewsets.ModelViewSet):
