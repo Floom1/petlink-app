@@ -2,7 +2,7 @@ import os
 from django.conf import settings
 from rest_framework import viewsets, generics, permissions
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from .models import *
@@ -16,10 +16,16 @@ from rest_framework.decorators import action
 class AnimalViewSet(viewsets.ModelViewSet):
     queryset = Animal.objects.all()
     serializer_class = AnimalSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def list(self, request, *args, **kwargs):
         qs = Animal.objects.all()
-        qs = qs.filter(status__is_available=True)
+
+        mine = request.query_params.get('mine')
+        if mine == 'true' and request.user and request.user.is_authenticated:
+            qs = qs.filter(user=request.user)
+        else:
+            qs = qs.filter(status__is_available=True)
 
         species = request.query_params.get('species')
         breed = request.query_params.get('breed')
@@ -81,8 +87,40 @@ class AnimalViewSet(viewsets.ModelViewSet):
         if has_vacc == 'true':
             qs = qs.filter(has_vaccinations=True)
 
+        status_name = request.query_params.get('status_name')
+        if status_name:
+            qs = qs.filter(status__name=status_name)
+        is_available_param = request.query_params.get('is_available')
+        if is_available_param in ('true', 'false'):
+            qs = qs.filter(status__is_available=(is_available_param == 'true'))
+
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if not request.user.is_authenticated or instance.user_id != request.user.id:
+            return Response({'detail': 'Недостаточно прав'}, status=403)
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if not request.user.is_authenticated or instance.user_id != request.user.id:
+            return Response({'detail': 'Недостаточно прав'}, status=403)
+        return super().partial_update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if not request.user.is_authenticated or instance.user_id != request.user.id:
+            return Response({'detail': 'Недостаточно прав'}, status=403)
+        try:
+            AnimalApplication.objects.filter(animal=instance).update(status='rejected')
+        except Exception:
+            pass
+        return super().destroy(request, *args, **kwargs)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -108,6 +146,7 @@ class StatusViewSet(viewsets.ModelViewSet):
 class AnimalPhotoViewSet(viewsets.ModelViewSet):
     queryset = AnimalPhoto.objects.all()
     serializer_class = AnimalPhotoSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -116,6 +155,20 @@ class AnimalPhotoViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(animal_id=animal_id)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        animal_id = request.data.get('animal') or request.data.get('animal_id') or request.data.get('animal_id_write')
+        try:
+            animal_id_int = int(animal_id)
+        except Exception:
+            return Response({'animal_id': ['Обязательное поле']}, status=400)
+        try:
+            animal = Animal.objects.get(id=animal_id_int)
+        except Animal.DoesNotExist:
+            return Response({'animal_id': ['Животное не найдено']}, status=404)
+        if not request.user.is_authenticated or animal.user_id != request.user.id:
+            return Response({'detail': 'Недостаточно прав'}, status=403)
+        return super().create(request, *args, **kwargs)
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
@@ -230,6 +283,17 @@ class AnimalApplicationViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data={'status': new_status}, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
+
+        if new_status == 'approved':
+            try:
+                st, _ = Status.objects.get_or_create(name='Уже пристроен', defaults={'is_available': False})
+                animal = instance.animal
+                animal.status = st
+                animal.save(update_fields=['status'])
+                AnimalApplication.objects.filter(animal=animal).exclude(id=instance.id).update(status='rejected')
+            except Exception:
+                pass
+
         return Response(serializer.data)
 
 

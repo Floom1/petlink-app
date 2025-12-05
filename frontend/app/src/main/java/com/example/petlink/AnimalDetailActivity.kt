@@ -47,7 +47,7 @@ class AnimalDetailActivity : AppCompatActivity() {
     private lateinit var tvSellerName: TextView
     private lateinit var sharedPreferences: SharedPreferences
 
-    private var animalId: Long = 0
+    private var animalId: Int = 0
     private var isFavorite: Boolean = false
     private var api: PetLinkApi? = null
     private var sellerUser: UserResponse? = null
@@ -60,8 +60,8 @@ class AnimalDetailActivity : AppCompatActivity() {
         // Initialize views
         initViews()
 
-        // Get animal ID from intent
-        animalId = intent.getLongExtra("animal_id", 0)
+        // Get animal ID from intent (всегда Int, чтобы не терять значение)
+        animalId = intent.getIntExtra("animal_id", 0)
 
         // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
@@ -117,7 +117,7 @@ class AnimalDetailActivity : AppCompatActivity() {
         }
 
         // Загружаем основные данные животного
-        api?.getAnimalDetail(animalId.toInt())?.enqueue(object : Callback<AnimalSimpleResponse> {
+        api?.getAnimalDetail(animalId)?.enqueue(object : Callback<AnimalSimpleResponse> {
             override fun onResponse(
                 call: Call<AnimalSimpleResponse>,
                 response: Response<AnimalSimpleResponse>
@@ -216,7 +216,7 @@ class AnimalDetailActivity : AppCompatActivity() {
         }
 
         // Загружаем фотографии
-        api?.getAnimalPhotos(animalId)?.enqueue(object : Callback<List<AnimalPhotoReq>> {
+        api?.getAnimalPhotos(animalId.toLong())?.enqueue(object : Callback<List<AnimalPhotoReq>> {
             override fun onResponse(call: Call<List<AnimalPhotoReq>>, response: Response<List<AnimalPhotoReq>>) {
                 if (response.isSuccessful) {
                     photos = response.body() ?: emptyList()
@@ -470,7 +470,7 @@ class AnimalDetailActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     // Предварительная проверка: есть ли уже активная заявка от текущего пользователя на это животное
                     RetrofitClient.apiService.getAnimalApplications(
-                        "Token $token", role = "buyer", status = "submitted", animal = animalId.toInt()
+                        "Token $token", role = "buyer", status = "submitted", animal = animalId
                     ).enqueue(object: Callback<List<AnimalApplication>> {
                         override fun onResponse(callCheck: Call<List<AnimalApplication>>, respCheck: Response<List<AnimalApplication>>) {
                             if (respCheck.isSuccessful) {
@@ -511,7 +511,7 @@ class AnimalDetailActivity : AppCompatActivity() {
                                     val msg = etMessage.text?.toString()?.take(500)
                                     RetrofitClient.apiService.createAnimalApplication(
                                         "Token $token",
-                                        AnimalApplicationCreate(animalId.toInt(), msg)
+                                        AnimalApplicationCreate(animalId, msg)
                                     ).enqueue(object : Callback<AnimalApplication> {
                                         override fun onResponse(call2: Call<AnimalApplication>, resp: Response<AnimalApplication>) {
                                             if (resp.isSuccessful) {

@@ -176,7 +176,8 @@
         <Button
             android:id="@+id/button_access"
             android:layout_width="220dp"
-            android:layout_height="35dp"            android:layout_gravity="center"
+            android:layout_height="35dp"
+            android:layout_gravity="center"
             android:layout_marginTop="16dp"
             android:background="@drawable/btn_stroke_black"
             android:backgroundTint="@null"
@@ -190,7 +191,8 @@
             <Button
                 android:id="@+id/button_test"
                 android:layout_width="220dp"
-                android:layout_height="35dp"            android:layout_gravity="center"
+                android:layout_height="35dp"
+                android:layout_gravity="center"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/btn_stroke_black"
                 android:backgroundTint="@null"
@@ -211,6 +213,21 @@
             android:backgroundTint="@null"
             app:backgroundTint="@null"
             android:text="Мои заявки"
+            android:textColor="#FFFFFF"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:textSize="14sp"/>
+
+        <Button
+            android:id="@+id/button_my_ads"
+            android:layout_width="220dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/btn_stroke_black"
+            android:backgroundTint="@null"
+            app:backgroundTint="@null"
+            android:text="Мои объявления"
             android:textColor="#FFFFFF"
             android:paddingTop="0dp"
             android:paddingBottom="0dp"

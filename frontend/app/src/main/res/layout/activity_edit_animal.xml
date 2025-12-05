@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include layout="@layout/toolbar" />
+
+        <LinearLayout
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:gravity="center_vertical">
+
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Отмена"
+                android:background="@drawable/btn_stroke_black"
+                android:backgroundTint="@null"
+                app:backgroundTint="@null"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/btnDeleteTop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Удалить"
+                android:background="@drawable/btn_stroke_black"
+                android:backgroundTint="@null"
+                app:backgroundTint="@android:color/holo_red_dark"
+                android:textColor="#FFF"
+                android:visibility="gone"/>
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Фото"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnAddPhotos"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Добавить фото"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/btn_stroke_black"
+                android:backgroundTint="@null"
+                app:backgroundTint="@null"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerLocalPhotos"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:overScrollMode="never"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerExistingPhotos"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:overScrollMode="never"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Вид животного"
+                android:textStyle="bold"
+                android:layout_marginTop="12dp"/>
+            <Spinner
+                android:id="@+id/spinnerSpecies"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Порода"
+                android:textStyle="bold"
+                android:layout_marginTop="12dp"/>
+            <Spinner
+                android:id="@+id/spinnerBreed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Имя"/>
+            <EditText
+                android:id="@+id/etName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/edittext_rounded_border"
+                android:padding="10dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Возраст (лет)"/>
+            <EditText
+                android:id="@+id/etAge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:background="@drawable/edittext_rounded_border"
+                android:padding="10dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Пол"/>
+            <RadioGroup
+                android:id="@+id/rgGender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <RadioButton
+                    android:id="@+id/rbMale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Мужской"
+                    android:buttonTint="#C7F0BD"/>
+                <RadioButton
+                    android:id="@+id/rbFemale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Женский"
+                    android:buttonTint="#C7F0BD"/>
+            </RadioGroup>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Цвет"/>
+            <EditText
+                android:id="@+id/etColor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/edittext_rounded_border"
+                android:padding="10dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Описание"/>
+            <EditText
+                android:id="@+id/etDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minLines="3"
+                android:gravity="top|start"
+                android:background="@drawable/edittext_rounded_border"
+                android:padding="10dp"/>
+
+            <CheckBox
+                android:id="@+id/cbFree"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Бесплатно"
+                android:layout_marginTop="8dp"
+                android:buttonTint="#C7F0BD"/>
+            <EditText
+                android:id="@+id/etPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:background="@drawable/edittext_rounded_border"
+                android:padding="10dp"/>
+
+            <CheckBox
+                android:id="@+id/cbSterilized"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Стерилизовано"
+                android:buttonTint="#C7F0BD"/>
+            <CheckBox
+                android:id="@+id/cbVaccinations"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Есть прививки"
+                android:buttonTint="#C7F0BD"/>
+            <CheckBox
+                android:id="@+id/cbHypoallergenic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Гипоаллергенный"
+                android:buttonTint="#C7F0BD"/>
+            <CheckBox
+                android:id="@+id/cbChildFriendly"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Дружелюбен к детям"
+                android:buttonTint="#C7F0BD"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Требования к пространству"/>
+            <Spinner
+                android:id="@+id/spinnerSpace"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/btn_stroke_black"
+                android:backgroundTint="@null"
+                app:backgroundTint="@null"
+                android:text="Сохранить"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

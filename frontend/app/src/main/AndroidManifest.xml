@@ -45,6 +45,15 @@
         <activity
             android:name=".ApplicationDetailActivity"
             android:exported="true" />
+        <activity
+            android:name=".MyAdsActivity"
+            android:exported="true" />
+        <activity
+            android:name=".MyAnimalDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditAnimalActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

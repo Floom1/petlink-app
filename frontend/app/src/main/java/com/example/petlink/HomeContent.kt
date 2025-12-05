@@ -278,7 +278,7 @@ class HomeContent {
 
             v.setOnClickListener {
                 val intent = Intent(context, AnimalDetailActivity::class.java)
-                intent.putExtra("animal_id", animal.id)
+                intent.putExtra("animal_id", animal.id.toInt())
                 context.startActivity(intent)
             }
 

@@ -54,6 +54,41 @@ class AnimalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Animal
         fields = '__all__'
+        extra_kwargs = {
+            'user': {'read_only': True, 'required': False},
+            'status': {'required': False, 'allow_null': True},
+        }
+
+    def validate_age(self, value):
+        if value is None:
+            return value
+        try:
+            v = float(value)
+        except (TypeError, ValueError):
+            raise serializers.ValidationError('Возраст должен быть числом')
+        if v < 0 or v > 30:
+            raise serializers.ValidationError('Возраст должен быть в пределах 0–30 лет')
+        return value
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if request and request.user and request.user.is_authenticated:
+            validated_data['user'] = request.user
+        if 'status' not in validated_data or validated_data.get('status') is None:
+            st = None
+            try:
+                st = Status.objects.get(name='Пристраивается')
+            except Status.DoesNotExist:
+                st = None
+
+            if st is None:
+                st = Status.objects.filter(is_available=True).first()
+
+            if st is None:
+                st = Status.objects.create(name='Пристраивается', is_available=True)
+
+            validated_data['status'] = st
+        return super().create(validated_data)
 
 
 class SpeciesSerializer(serializers.ModelSerializer):
@@ -75,11 +110,26 @@ class StatusSerializer(serializers.ModelSerializer):
 
 
 class AnimalPhotoSerializer(serializers.ModelSerializer):
+    animal = serializers.PrimaryKeyRelatedField(queryset=Animal.objects.all(), write_only=True, required=False)
     animal_id = serializers.IntegerField(source='animal.id', read_only=True)
+    animal_id_write = serializers.IntegerField(write_only=True, required=False)
 
     class Meta:
         model = AnimalPhoto
-        fields = ['id', 'animal_id', 'photo_url', 'is_main', 'order']
+        fields = ['id', 'animal', 'animal_id', 'animal_id_write', 'photo_url', 'is_main', 'order']
+
+    def create(self, validated_data):
+        animal = validated_data.pop('animal', None)
+        animal_id_write = validated_data.pop('animal_id_write', None)
+        if animal is None and animal_id_write is not None:
+            try:
+                animal = Animal.objects.get(id=animal_id_write)
+            except Animal.DoesNotExist:
+                raise serializers.ValidationError({'animal_id': ['Животное не найдено']})
+        if animal is None:
+            raise serializers.ValidationError({'animal': ['Обязательное поле']})
+        validated_data['animal'] = animal
+        return super().create(validated_data)
 
 
 class ServiceSerializer(serializers.ModelSerializer):

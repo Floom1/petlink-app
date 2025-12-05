@@ -67,6 +67,10 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        findViewById<Button>(R.id.button_my_ads)?.setOnClickListener {
+            startActivity(Intent(this, MyAdsActivity::class.java))
+        }
+
         loadUser()
     }
 

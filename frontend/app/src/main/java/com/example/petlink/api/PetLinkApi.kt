@@ -27,6 +27,7 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Header
 import retrofit2.http.Path
+import retrofit2.http.DELETE
 
 
 interface PetLinkApi {
@@ -38,6 +39,7 @@ interface PetLinkApi {
 
     @GET("api/animals/")
     fun getAnimals(
+        @Header("Authorization") authHeader: String? = null,
         @Query("species") speciesId: Int? = null,
         @Query("breed") breedId: Int? = null,
         @Query("gender") gender: String? = null,
@@ -49,7 +51,10 @@ interface PetLinkApi {
         @Query("child_friendly") childFriendly: Boolean? = null,
         @Query("space_requirements") spaceRequirements: String? = null,
         @Query("is_sterilized") isSterilized: Boolean? = null,
-        @Query("has_vaccinations") hasVaccinations: Boolean? = null
+        @Query("has_vaccinations") hasVaccinations: Boolean? = null,
+        @Query("mine") mine: Boolean? = null,
+        @Query("status_name") statusName: String? = null,
+        @Query("is_available") isAvailable: Boolean? = null
     ): Call<List<AnimalReq>>
 
 //    @GET("api/animal_photos/")
@@ -57,6 +62,18 @@ interface PetLinkApi {
 
     @GET("api/animal_photos/")
     fun getAnimalPhotos(@Query("animal_id") animalId: Long? = null): Call<List<AnimalPhotoReq>>
+
+    @POST("api/animal_photos/")
+    fun createAnimalPhoto(
+        @Header("Authorization") authHeader: String,
+        @Body body: com.example.petlink.data.model.AnimalPhotoCreate
+    ): Call<AnimalPhotoReq>
+
+    @DELETE("api/animal_photos/{id}/")
+    fun deleteAnimalPhoto(
+        @Header("Authorization") authHeader: String,
+        @Path("id") id: Long
+    ): Call<Void>
 
     @GET("api/users/{id}/")
     fun getUser(@Path("id") id: Long): Call<UserResponse>
@@ -109,6 +126,25 @@ interface PetLinkApi {
 
     @GET("api/animals/{id}/")
     fun getAnimalDetail(@Path("id") id: Int): Call<AnimalSimpleResponse>
+
+    @POST("api/animals/")
+    fun createAnimal(
+        @Header("Authorization") authHeader: String,
+        @Body fields: Map<String, @JvmSuppressWildcards Any?>
+    ): Call<AnimalSimpleResponse>
+
+    @PATCH("api/animals/{id}/")
+    fun updateAnimal(
+        @Header("Authorization") authHeader: String,
+        @Path("id") id: Int,
+        @Body fields: Map<String, @JvmSuppressWildcards Any?>
+    ): Call<AnimalSimpleResponse>
+
+    @DELETE("api/animals/{id}/")
+    fun deleteAnimal(
+        @Header("Authorization") authHeader: String,
+        @Path("id") id: Int
+    ): Call<Void>
 
     // Applications (animal)
     @POST("api/animal_apps/")
