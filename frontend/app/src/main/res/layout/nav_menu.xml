@@ -47,14 +47,14 @@
                 android:layout_width="@dimen/bottom_nav_icon"
                 android:layout_height="@dimen/bottom_nav_icon"
                 android:layout_marginBottom="4dp"
-                android:src="@drawable/ic_search" />
+                android:src="@drawable/ic_favorite" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textColor="#000000"
                 android:textSize="@dimen/bottom_nav_text_size"
-                android:text="Поиск" />
+                android:text="Избранное" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/nav_favorites"
@@ -68,7 +68,7 @@
                 android:layout_width="@dimen/bottom_nav_icon"
                 android:layout_height="@dimen/bottom_nav_icon"
                 android:layout_marginBottom="4dp"
-                android:src="@drawable/ic_favorite" />
+                android:src="@drawable/ic_bell" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
                 android:maxLines="1"
                 android:singleLine="true"
                 android:ellipsize="end"
-                android:text="Уведомления" />
+                android:text="Заявки" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/nav_profile"

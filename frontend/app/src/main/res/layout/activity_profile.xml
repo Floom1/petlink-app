@@ -159,34 +159,19 @@
 
 
             <Button
-                android:id="@+id/button_photo"
+                android:id="@+id/button_access"
                 android:layout_width="220dp"
                 android:layout_height="35dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/btn_stroke_gray"
+                android:background="@drawable/btn_stroke_black"
                 android:backgroundTint="@null"
+                app:backgroundTint="@null"
+                android:text="Подтвердить изменения"
+                android:textColor="#FFFFFF"
                 android:paddingTop="0dp"
                 android:paddingBottom="0dp"
-                android:text="Загрузить новое фото"
-                android:textColor="#000"
-                android:textSize="14sp"
-                app:backgroundTint="@null" />
-
-        <Button
-            android:id="@+id/button_access"
-            android:layout_width="220dp"
-            android:layout_height="35dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/btn_stroke_black"
-            android:backgroundTint="@null"
-            app:backgroundTint="@null"
-            android:text="Подтвердить изменения"
-            android:textColor="#FFFFFF"
-            android:paddingTop="0dp"
-            android:paddingBottom="0dp"
-            android:textSize="14sp"/>
+                android:textSize="14sp"/>
 
             <Button
                 android:id="@+id/button_test"

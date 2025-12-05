@@ -66,6 +66,8 @@ class EditAnimalActivity : AppCompatActivity() {
     private val localUris = mutableListOf<Uri>()
     private var existingPhotos = mutableListOf<AnimalPhotoReq>()
 
+    private var mainExistingPhotoId: Long? = null
+
     private lateinit var pickImagesLauncher: ActivityResultLauncher<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,8 +112,14 @@ class EditAnimalActivity : AppCompatActivity() {
         recyclerExisting = findViewById(R.id.recyclerExistingPhotos)
         recyclerLocal.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         recyclerExisting.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        localAdapter = LocalPhotoAdapter { pos -> localUris.removeAt(pos); localAdapter.submit(localUris) }
-        existingAdapter = ExistingPhotoAdapter { photo -> deleteExistingPhoto(photo) }
+        localAdapter = LocalPhotoAdapter { pos ->
+            localUris.removeAt(pos)
+            localAdapter.submit(localUris)
+        }
+        existingAdapter = ExistingPhotoAdapter(
+            onRemove = { photo -> deleteExistingPhoto(photo) },
+            onSelectMain = { photo -> onExistingMainSelected(photo) }
+        )
         recyclerLocal.adapter = localAdapter
         recyclerExisting.adapter = existingAdapter
 
@@ -183,6 +191,11 @@ class EditAnimalActivity : AppCompatActivity() {
         })
     }
 
+    private fun onExistingMainSelected(photo: AnimalPhotoReq) {
+        mainExistingPhotoId = photo.id
+        existingAdapter.setMainId(photo.id)
+    }
+
     private fun loadExisting() {
         val id = animalId ?: return
         val sp = getSharedPreferences("user_session", Context.MODE_PRIVATE)
@@ -198,7 +211,8 @@ class EditAnimalActivity : AppCompatActivity() {
                         override fun onResponse(call2: Call<List<AnimalPhotoReq>>, resp: Response<List<AnimalPhotoReq>>) {
                             if (resp.isSuccessful) {
                                 existingPhotos = resp.body()?.toMutableList() ?: mutableListOf()
-                                existingAdapter.submit(existingPhotos)
+                                mainExistingPhotoId = existingPhotos.firstOrNull { it.is_main == true }?.id
+                                existingAdapter.submit(existingPhotos, mainExistingPhotoId)
                             }
                             progress.visibility = View.GONE
                             updateDeleteVisibility(a)
@@ -308,7 +322,19 @@ class EditAnimalActivity : AppCompatActivity() {
             RetrofitClient.apiService.updateAnimal("Token $token", id, fields).enqueue(object: Callback<AnimalSimpleResponse> {
                 override fun onResponse(call: Call<AnimalSimpleResponse>, response: Response<AnimalSimpleResponse>) {
                     if (response.isSuccessful) {
-                        if (localUris.isNotEmpty()) uploadAndLinkPhotos(token, id) else { progress.visibility = View.GONE; finish() }
+                        if (localUris.isNotEmpty()) {
+                            uploadAndLinkPhotos(token, id) {
+                                finalizeMainPhotoSelection(token, id) {
+                                    progress.visibility = View.GONE
+                                    finish()
+                                }
+                            }
+                        } else {
+                            finalizeMainPhotoSelection(token, id) {
+                                progress.visibility = View.GONE
+                                finish()
+                            }
+                        }
                     } else {
                         progress.visibility = View.GONE
                         showSaveError(response)
@@ -319,11 +345,19 @@ class EditAnimalActivity : AppCompatActivity() {
         }
     }
 
-    private fun uploadAndLinkPhotos(token: String, animalId: Int) {
-        if (localUris.isEmpty()) { progress.visibility = View.GONE; finish(); return }
+    private fun uploadAndLinkPhotos(token: String, animalId: Int, onAllDone: (() -> Unit)? = null) {
+        if (localUris.isEmpty()) {
+            if (onAllDone != null) {
+                onAllDone()
+            } else {
+                progress.visibility = View.GONE
+                finish()
+            }
+            return
+        }
         var completed = 0
         localUris.forEachIndexed { index, uri ->
-            val temp = uriToTempFile(uri) ?: run { nextPhoto(++completed); return@forEachIndexed }
+            val temp = uriToTempFile(uri) ?: run { nextPhoto(++completed, onAllDone); return@forEachIndexed }
             val part = MultipartBody.Part.createFormData("image", temp.name, temp.asRequestBody("image/*".toMediaTypeOrNull()))
             RetrofitClient.apiService.uploadProfileImage("Token $token", part).enqueue(object: Callback<UploadResponse> {
                 override fun onResponse(call: Call<UploadResponse>, response: Response<UploadResponse>) {
@@ -331,17 +365,75 @@ class EditAnimalActivity : AppCompatActivity() {
                     if (!url.isNullOrEmpty()) {
                         val body = AnimalPhotoCreate(animal_id_write = animalId, photo_url = url, is_main = index == 0, order = index)
                         RetrofitClient.apiService.createAnimalPhoto("Token $token", body).enqueue(object: Callback<AnimalPhotoReq> {
-                            override fun onResponse(call2: Call<AnimalPhotoReq>, resp: Response<AnimalPhotoReq>) { nextPhoto(++completed) }
-                            override fun onFailure(call2: Call<AnimalPhotoReq>, t: Throwable) { nextPhoto(++completed) }
+                            override fun onResponse(call2: Call<AnimalPhotoReq>, resp: Response<AnimalPhotoReq>) { nextPhoto(++completed, onAllDone) }
+                            override fun onFailure(call2: Call<AnimalPhotoReq>, t: Throwable) { nextPhoto(++completed, onAllDone) }
                         })
-                    } else nextPhoto(++completed)
+                    } else nextPhoto(++completed, onAllDone)
                 }
-                override fun onFailure(call: Call<UploadResponse>, t: Throwable) { nextPhoto(++completed) }
+                override fun onFailure(call: Call<UploadResponse>, t: Throwable) { nextPhoto(++completed, onAllDone) }
             })
         }
     }
 
-    private fun nextPhoto(done: Int) { if (done >= localUris.size) { progress.visibility = View.GONE; finish() } }
+    private fun nextPhoto(done: Int, onAllDone: (() -> Unit)?) {
+        if (done >= localUris.size) {
+            if (onAllDone != null) {
+                onAllDone()
+            } else {
+                progress.visibility = View.GONE
+                finish()
+            }
+        }
+    }
+
+    private fun finalizeMainPhotoSelection(token: String, animalId: Int, onDone: () -> Unit) {
+        val mainId = mainExistingPhotoId
+        if (mainId == null) {
+            onDone()
+            return
+        }
+        RetrofitClient.apiService.getAnimalPhotos(animalId.toLong()).enqueue(object : Callback<List<AnimalPhotoReq>> {
+            override fun onResponse(call: Call<List<AnimalPhotoReq>>, response: Response<List<AnimalPhotoReq>>) {
+                if (!response.isSuccessful) {
+                    onDone()
+                    return
+                }
+                val photos = response.body().orEmpty()
+                if (photos.isEmpty()) {
+                    onDone()
+                    return
+                }
+                var pending = 0
+                for (p in photos) {
+                    val desired = (p.id == mainId)
+                    if (p.is_main == desired) continue
+                    pending++
+                    RetrofitClient.apiService.updateAnimalPhoto(
+                        "Token $token",
+                        p.id,
+                        mapOf("is_main" to desired)
+                    ).enqueue(object : Callback<AnimalPhotoReq> {
+                        override fun onResponse(call2: Call<AnimalPhotoReq>, resp: Response<AnimalPhotoReq>) {
+                            pending--
+                            if (pending == 0) onDone()
+                        }
+
+                        override fun onFailure(call2: Call<AnimalPhotoReq>, t: Throwable) {
+                            pending--
+                            if (pending == 0) onDone()
+                        }
+                    })
+                }
+                if (pending == 0) {
+                    onDone()
+                }
+            }
+
+            override fun onFailure(call: Call<List<AnimalPhotoReq>>, t: Throwable) {
+                onDone()
+            }
+        })
+    }
 
     private fun uriToTempFile(uri: Uri): File? {
         return try {
@@ -367,7 +459,10 @@ class EditAnimalActivity : AppCompatActivity() {
         RetrofitClient.apiService.deleteAnimalPhoto("Token $token", photo.id).enqueue(object: Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 existingPhotos.removeAll { it.id == photo.id }
-                existingAdapter.submit(existingPhotos)
+                if (mainExistingPhotoId == photo.id) {
+                    mainExistingPhotoId = null
+                }
+                existingAdapter.submit(existingPhotos, mainExistingPhotoId)
             }
             override fun onFailure(call: Call<Void>, t: Throwable) {}
         })

@@ -53,7 +53,7 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Button>(R.id.button_photo)?.setOnClickListener {
+        findViewById<ImageView>(R.id.imageView)?.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
 

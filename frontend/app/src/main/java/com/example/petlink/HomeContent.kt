@@ -266,7 +266,7 @@ class HomeContent {
         grid.removeAllViews()
         val inflater = LayoutInflater.from(context)
 
-        val photosMap = photos.associateBy { it.animal_id }
+        val photosByAnimal = photos.groupBy { it.animal_id }
         val statusMap = statuses.associateBy { it.id }
 
         for (animal in animals) {
@@ -285,10 +285,13 @@ class HomeContent {
             title.text = animal.name ?: "Без названия"
             price.text = animal.price.toString()
 
-            val photo = photosMap[animal.id]
+            val list = photosByAnimal[animal.id] ?: emptyList()
+            val mainPhoto = list.firstOrNull { it.is_main == true }
+                ?: list.minByOrNull { it.order }
+                ?: list.firstOrNull()
 
-            if (photo?.photo_url != null && photo.photo_url.isNotEmpty()) {
-                Glide.with(context).load(photo.photo_url).centerCrop().into(image)
+            if (mainPhoto?.photo_url != null && mainPhoto.photo_url.isNotEmpty()) {
+                Glide.with(context).load(mainPhoto.photo_url).centerCrop().into(image)
             } else {
                 Glide.with(context).load(R.drawable.cat).centerCrop().into(image)
             }

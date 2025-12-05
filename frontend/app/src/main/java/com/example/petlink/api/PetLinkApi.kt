@@ -75,6 +75,13 @@ interface PetLinkApi {
         @Path("id") id: Long
     ): Call<Void>
 
+    @PATCH("api/animal_photos/{id}/")
+    fun updateAnimalPhoto(
+        @Header("Authorization") authHeader: String,
+        @Path("id") id: Long,
+        @Body fields: Map<String, @JvmSuppressWildcards Any?>
+    ): Call<AnimalPhotoReq>
+
     @GET("api/users/{id}/")
     fun getUser(@Path("id") id: Long): Call<UserResponse>
 

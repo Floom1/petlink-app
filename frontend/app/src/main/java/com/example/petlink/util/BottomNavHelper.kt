@@ -31,7 +31,7 @@ object BottomNavHelper {
             }
         }
         search?.setOnClickListener {
-            Toast.makeText(activity, "Поиск: скоро", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity, "Избранное: скоро", Toast.LENGTH_SHORT).show()
         }
         favorites?.setOnClickListener {
             // Открываем список входящих заявок (seller scope)

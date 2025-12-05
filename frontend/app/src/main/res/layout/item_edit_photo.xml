@@ -12,21 +12,39 @@
         android:scaleType="centerCrop"
         android:background="@drawable/rounded_square_border"/>
 
-    <Button
-        android:id="@+id/btnRemove"
+    <TextView
+        android:id="@+id/tvMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Удалить"
-        android:layout_gravity="end|top"
+        android:layout_gravity="start|top"
+        android:layout_margin="4dp"
         android:background="@drawable/btn_stroke_black"
-        android:backgroundTint="@android:color/holo_red_dark"
-        app:backgroundTint="@android:color/holo_red_dark"
-        android:textColor="#FFF"
-        android:textSize="10sp"
+        android:backgroundTint="@null"
+        app:backgroundTint="@null"
         android:paddingLeft="6dp"
         android:paddingRight="6dp"
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
+        android:text="Главное"
+        android:textColor="#FFFFFF"
+        android:textSize="10sp"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/btnRemove"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="4dp"
+        android:background="@drawable/btn_stroke_black"
+        android:backgroundTint="@android:color/holo_red_dark"
+        android:paddingLeft="6dp"
+        android:paddingTop="2dp"
+        android:paddingRight="6dp"
+        android:paddingBottom="2dp"
         android:singleLine="true"
-        android:layout_margin="4dp"/>
+        android:text="Удалить"
+        android:textColor="#FFF"
+        android:textSize="10sp"
+        app:backgroundTint="@android:color/holo_red_dark" />
 </FrameLayout>
