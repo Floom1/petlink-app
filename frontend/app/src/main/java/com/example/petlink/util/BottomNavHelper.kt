@@ -7,6 +7,7 @@ import android.widget.Toast
 import com.example.petlink.MainActivity
 import com.example.petlink.ProfileActivity
 import com.example.petlink.R
+import com.example.petlink.FavoritesActivity
 import android.widget.ImageView
 import android.graphics.PorterDuff
 import android.graphics.Color
@@ -31,13 +32,17 @@ object BottomNavHelper {
             }
         }
         search?.setOnClickListener {
-            Toast.makeText(activity, "Избранное: скоро", Toast.LENGTH_SHORT).show()
+            if (activity !is FavoritesActivity) {
+                activity.startActivity(Intent(activity, FavoritesActivity::class.java))
+            }
         }
         favorites?.setOnClickListener {
             // Открываем список входящих заявок (seller scope)
-            val intent = Intent(activity, ApplicationsActivity::class.java)
-            intent.putExtra("role", "seller")
-            activity.startActivity(intent)
+            if (activity !is ApplicationsActivity) {
+                val intent = Intent(activity, ApplicationsActivity::class.java)
+                intent.putExtra("role", "seller")
+                activity.startActivity(intent)
+            }
         }
         profile?.setOnClickListener {
             if (activity !is ProfileActivity) {

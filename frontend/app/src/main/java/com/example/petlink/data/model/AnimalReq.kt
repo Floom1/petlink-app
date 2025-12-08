@@ -6,4 +6,5 @@ data class AnimalReq(
     val price: Double?,
     val imageUrl: String?,
     val status: Long,
+    val is_favorite: Boolean? = null,
 )

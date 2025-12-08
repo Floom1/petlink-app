@@ -114,7 +114,7 @@ class MyAnimalDetailActivity : AppCompatActivity() {
             return
         }
 
-        RetrofitClient.apiService.getAnimalDetail(animalId).enqueue(object: Callback<AnimalSimpleResponse> {
+        RetrofitClient.apiService.getAnimalDetail(null, animalId).enqueue(object: Callback<AnimalSimpleResponse> {
             override fun onResponse(
                 call: Call<AnimalSimpleResponse>, response: Response<AnimalSimpleResponse>
             ) {

@@ -54,6 +54,9 @@
         <activity
             android:name=".EditAnimalActivity"
             android:exported="false" />
+        <activity
+            android:name=".FavoritesActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

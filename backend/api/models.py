@@ -110,6 +110,16 @@ class AnimalPhoto(models.Model):
     def __str__(self):
         return f"Фото для {self.animal.name}"
 
+class Favorite(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='favorites')
+    animal = models.ForeignKey(Animal, on_delete=models.CASCADE, related_name='favorited_by')
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ('user', 'animal')
+
+    def __str__(self):
+        return f"{self.user.email} 	 {self.animal.name}"
 
 class Service(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='services')

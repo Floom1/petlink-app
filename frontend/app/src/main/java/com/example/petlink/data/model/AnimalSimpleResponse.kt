@@ -17,5 +17,6 @@ data class AnimalSimpleResponse(
     val is_hypoallergenic: Boolean?,
     val child_friendly: Boolean?,
     val space_requirements: String?,
-    val user: Int?
+    val user: Int?,
+    val is_favorite: Boolean? = null,
 )

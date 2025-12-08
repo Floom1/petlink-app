@@ -97,6 +97,25 @@ class AnimalViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
 
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def favorite(self, request, pk=None):
+        animal = self.get_object()
+        Favorite.objects.get_or_create(user=request.user, animal=animal)
+        serializer = self.get_serializer(animal)
+        return Response(serializer.data)
+
+    @favorite.mapping.delete
+    def unfavorite(self, request, pk=None):
+        animal = self.get_object()
+        Favorite.objects.filter(user=request.user, animal=animal).delete()
+        return Response(status=204)
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def favorites(self, request):
+        qs = Animal.objects.filter(favorited_by__user=request.user, status__is_available=True)
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
+
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 

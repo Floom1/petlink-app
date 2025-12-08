@@ -51,6 +51,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class AnimalSerializer(serializers.ModelSerializer):
+    is_favorite = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Animal
         fields = '__all__'
@@ -58,6 +60,17 @@ class AnimalSerializer(serializers.ModelSerializer):
             'user': {'read_only': True, 'required': False},
             'status': {'required': False, 'allow_null': True},
         }
+
+    def get_is_favorite(self, obj):
+        request = self.context.get('request')
+        user = getattr(request, 'user', None) if request is not None else None
+        if not user or not user.is_authenticated:
+            return False
+        try:
+            from .models import Favorite
+            return Favorite.objects.filter(user=user, animal=obj).exists()
+        except Exception:
+            return False
 
     def validate_age(self, value):
         if value is None:

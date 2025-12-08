@@ -201,7 +201,7 @@ class EditAnimalActivity : AppCompatActivity() {
         val sp = getSharedPreferences("user_session", Context.MODE_PRIVATE)
         val token = sp.getString("auth_token", null) ?: return
         progress.visibility = View.VISIBLE
-        RetrofitClient.apiService.getAnimalDetail(id).enqueue(object: Callback<AnimalSimpleResponse> {
+        RetrofitClient.apiService.getAnimalDetail(null, id).enqueue(object: Callback<AnimalSimpleResponse> {
             override fun onResponse(call: Call<AnimalSimpleResponse>, response: Response<AnimalSimpleResponse>) {
                 if (response.isSuccessful) {
                     val a = response.body()

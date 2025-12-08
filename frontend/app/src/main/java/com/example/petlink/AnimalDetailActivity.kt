@@ -117,7 +117,7 @@ class AnimalDetailActivity : AppCompatActivity() {
         }
 
         // Загружаем основные данные животного
-        api?.getAnimalDetail(animalId)?.enqueue(object : Callback<AnimalSimpleResponse> {
+        api?.getAnimalDetail("Token $token", animalId)?.enqueue(object : Callback<AnimalSimpleResponse> {
             override fun onResponse(
                 call: Call<AnimalSimpleResponse>,
                 response: Response<AnimalSimpleResponse>
@@ -301,6 +301,10 @@ class AnimalDetailActivity : AppCompatActivity() {
 
         // Generate tags
         generateTags(animal)
+
+        // Favorite state
+        isFavorite = animal.is_favorite == true
+        updateFavoriteIcon()
     }
 
     private fun formatAge(age: Double): String {
@@ -449,13 +453,129 @@ class AnimalDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun toggleFavorite() {
-        isFavorite = !isFavorite
+    private fun updateFavoriteIcon() {
         btnFavorite.setImageResource(
             if (isFavorite) R.drawable.ic_heart_filled else R.drawable.ic_heart_outline
         )
-        // TODO: Implement API call to save favorite status
-        Toast.makeText(this, if (isFavorite) "Добавлено в избранное" else "Удалено из избранного", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun animateFavorite() {
+        try {
+            btnFavorite.animate().cancel()
+            btnFavorite.scaleX = 1f
+            btnFavorite.scaleY = 1f
+            btnFavorite.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(120)
+                .withEndAction {
+                    btnFavorite.animate().scaleX(1f).scaleY(1f).setDuration(120).start()
+                }
+                .start()
+        } catch (_: Exception) { }
+    }
+
+    private fun toggleFavorite() {
+        val token = sharedPreferences.getString("auth_token", null)
+        if (token.isNullOrEmpty()) {
+            Toast.makeText(this, "Требуется вход", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val previous = isFavorite
+        isFavorite = !isFavorite
+        updateFavoriteIcon()
+        animateFavorite()
+
+        val authHeader = "Token $token"
+
+        if (isFavorite) {
+            RetrofitClient.apiService.addFavorite(authHeader, animalId)
+                .enqueue(object : Callback<AnimalSimpleResponse> {
+                    override fun onResponse(
+                        call: Call<AnimalSimpleResponse>,
+                        response: Response<AnimalSimpleResponse>
+                    ) {
+                        if (!response.isSuccessful) {
+                            isFavorite = previous
+                            updateFavoriteIcon()
+                            Toast.makeText(this@AnimalDetailActivity, "Ошибка добавления в избранное", Toast.LENGTH_SHORT).show()
+                            return
+                        }
+                        val body = response.body()
+                        if (body != null) {
+                            isFavorite = body.is_favorite == true
+                            updateFavoriteIcon()
+                        }
+                        Toast.makeText(this@AnimalDetailActivity, "Добавлено в избранное", Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onFailure(call: Call<AnimalSimpleResponse>, t: Throwable) {
+                        isFavorite = previous
+                        updateFavoriteIcon()
+                        Toast.makeText(this@AnimalDetailActivity, "Сеть недоступна: ${t.message}", Toast.LENGTH_SHORT).show()
+                    }
+                })
+        } else {
+            RetrofitClient.apiService.removeFavorite(authHeader, animalId)
+                .enqueue(object : Callback<Void> {
+                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                        if (response.isSuccessful) {
+                            showUndoFavoriteDialog()
+                        } else {
+                            isFavorite = previous
+                            updateFavoriteIcon()
+                            Toast.makeText(this@AnimalDetailActivity, "Ошибка удаления из избранного", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                        isFavorite = previous
+                        updateFavoriteIcon()
+                        Toast.makeText(this@AnimalDetailActivity, "Сеть недоступна: ${t.message}", Toast.LENGTH_SHORT).show()
+                    }
+                })
+        }
+    }
+
+    private fun showUndoFavoriteDialog() {
+        AlertDialog.Builder(this)
+            .setMessage("Удалено из избранного")
+            .setPositiveButton("Отменить") { _, _ ->
+                val token = sharedPreferences.getString("auth_token", null) ?: return@setPositiveButton
+                val authHeader = "Token $token"
+                val before = isFavorite
+                isFavorite = true
+                updateFavoriteIcon()
+                animateFavorite()
+                RetrofitClient.apiService.addFavorite(authHeader, animalId)
+                    .enqueue(object : Callback<AnimalSimpleResponse> {
+                        override fun onResponse(
+                            call: Call<AnimalSimpleResponse>,
+                            response: Response<AnimalSimpleResponse>
+                        ) {
+                            if (!response.isSuccessful) {
+                                isFavorite = before
+                                updateFavoriteIcon()
+                                Toast.makeText(this@AnimalDetailActivity, "Ошибка возврата в избранное", Toast.LENGTH_SHORT).show()
+                                return
+                            }
+                            val body = response.body()
+                            if (body != null) {
+                                isFavorite = body.is_favorite == true
+                                updateFavoriteIcon()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<AnimalSimpleResponse>, t: Throwable) {
+                            isFavorite = before
+                            updateFavoriteIcon()
+                            Toast.makeText(this@AnimalDetailActivity, "Сеть недоступна: ${t.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    })
+            }
+            .setNegativeButton("Ок", null)
+            .show()
     }
 
     private fun handleApplyButtonClick() {

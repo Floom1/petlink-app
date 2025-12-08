@@ -132,7 +132,10 @@ interface PetLinkApi {
     ): Call<List<AnimalReq>>
 
     @GET("api/animals/{id}/")
-    fun getAnimalDetail(@Path("id") id: Int): Call<AnimalSimpleResponse>
+    fun getAnimalDetail(
+        @Header("Authorization") authHeader: String? = null,
+        @Path("id") id: Int
+    ): Call<AnimalSimpleResponse>
 
     @POST("api/animals/")
     fun createAnimal(
@@ -180,5 +183,23 @@ interface PetLinkApi {
         @Header("Authorization") authHeader: String,
         @Path("id") id: Int
     ): Call<AnimalApplication>
+
+    // Favorites
+    @GET("api/animals/favorites/")
+    fun getFavoriteAnimals(
+        @Header("Authorization") authHeader: String
+    ): Call<List<AnimalReq>>
+
+    @POST("api/animals/{id}/favorite/")
+    fun addFavorite(
+        @Header("Authorization") authHeader: String,
+        @Path("id") id: Int
+    ): Call<AnimalSimpleResponse>
+
+    @DELETE("api/animals/{id}/favorite/")
+    fun removeFavorite(
+        @Header("Authorization") authHeader: String,
+        @Path("id") id: Int
+    ): Call<Void>
 
 }

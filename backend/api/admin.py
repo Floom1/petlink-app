@@ -65,3 +65,9 @@ class ServiceApplicationAdmin(admin.ModelAdmin):
     list_display = ('service', 'user', 'status', 'created_at')
     list_filter = ('status',)
     search_fields = ('message',)
+
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    list_display = ('user', 'animal', 'created_at')
+    list_filter = ('created_at',)

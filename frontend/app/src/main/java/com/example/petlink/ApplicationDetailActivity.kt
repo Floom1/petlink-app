@@ -120,8 +120,8 @@ class ApplicationDetailActivity : AppCompatActivity() {
             })
         } else {
             tvCounterpartyLabel.text = "Продавец"
-            // Контакты продавца: сначала деталь животного -> user id -> user
-            RetrofitClient.apiService.getAnimalDetail(a.animal).enqueue(object: Callback<AnimalSimpleResponse> {
+            // Контакты продавца: сначала деталь животного user id user
+            RetrofitClient.apiService.getAnimalDetail("Token $token", a.animal).enqueue(object: Callback<AnimalSimpleResponse> {
                 override fun onResponse(call: Call<AnimalSimpleResponse>, response: Response<AnimalSimpleResponse>) {
                     if (response.isSuccessful) {
                         val animal = response.body()
