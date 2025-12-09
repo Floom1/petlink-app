@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#DDF8FC"
-    tools:context=".RegActivity">
+    tools:context=".ui.auth.RegActivity">
 
     <include layout="@layout/toolbar" />
     <ScrollView

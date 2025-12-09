@@ -1,4 +1,4 @@
-package com.example.petlink
+package com.example.petlink.ui.favorites
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,9 +12,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.example.petlink.R
 import com.example.petlink.data.model.AnimalPhotoReq
 import com.example.petlink.data.model.AnimalReq
 import com.example.petlink.data.model.StatusReq
+import com.example.petlink.ui.auth.LoginActivity
+import com.example.petlink.ui.home.AnimalDetailActivity
 import com.example.petlink.util.BottomNavHelper
 import com.example.petlink.util.RetrofitClient
 import com.example.petlink.util.UserSession

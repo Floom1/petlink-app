@@ -1,6 +1,5 @@
-package com.example.petlink
+package com.example.petlink.ui.profile
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -17,17 +16,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.petlink.util.BottomNavHelper
 import com.bumptech.glide.Glide
+import com.example.petlink.ui.applications.ApplicationsActivity
+import com.example.petlink.R
+import com.example.petlink.ui.test.TestActivity
 import com.example.petlink.util.RetrofitClient
 import com.example.petlink.data.model.UploadResponse
-import com.example.petlink.api.PetLinkApi
 import com.example.petlink.data.model.UserResponse
+import com.example.petlink.ui.ads.MyAdsActivity
+import com.example.petlink.ui.auth.LoginActivity
 import com.example.petlink.util.UserSession
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

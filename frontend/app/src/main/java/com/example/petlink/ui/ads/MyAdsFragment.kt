@@ -1,4 +1,4 @@
-package com.example.petlink
+package com.example.petlink.ui.ads
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +9,9 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.petlink.ui.myanimal.EditAnimalActivity
+import com.example.petlink.ui.myanimal.MyAnimalDetailActivity
+import com.example.petlink.R
 import com.example.petlink.adapter.MyAdsAdapter
 import com.example.petlink.data.model.AnimalReq
 import com.example.petlink.util.RetrofitClient

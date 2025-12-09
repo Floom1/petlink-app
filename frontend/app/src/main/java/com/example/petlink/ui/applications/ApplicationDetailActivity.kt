@@ -1,4 +1,4 @@
-package com.example.petlink
+package com.example.petlink.ui.applications
 
 import android.os.Bundle
 import android.view.View
@@ -7,7 +7,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.petlink.api.PetLinkApi
+import com.example.petlink.R
 import com.example.petlink.data.model.AnimalSimpleResponse
 import com.example.petlink.data.model.AnimalApplication
 import com.example.petlink.data.model.UserResponse

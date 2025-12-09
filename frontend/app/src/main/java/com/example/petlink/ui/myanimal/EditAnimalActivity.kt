@@ -1,4 +1,4 @@
-package com.example.petlink
+package com.example.petlink.ui.myanimal
 
 import android.content.Context
 import android.net.Uri
@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.petlink.R
 import com.example.petlink.adapter.ExistingPhotoAdapter
 import com.example.petlink.adapter.LocalPhotoAdapter
 import com.example.petlink.data.model.*

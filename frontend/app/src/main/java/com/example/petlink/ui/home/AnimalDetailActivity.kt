@@ -1,4 +1,4 @@
-package com.example.petlink
+package com.example.petlink.ui.home
 
 import android.os.Bundle
 import android.view.View
@@ -7,13 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
 import com.example.petlink.adapter.AnimalPhotoAdapter
 import com.example.petlink.api.PetLinkApi
-import com.example.petlink.data.model.AnimalDetailResponse
 import com.example.petlink.data.model.AnimalPhotoReq
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import android.graphics.drawable.GradientDrawable
 import android.util.Log
 import android.content.Intent
@@ -29,6 +26,9 @@ import com.example.petlink.data.model.AnimalApplicationCreate
 import android.text.InputFilter
 import android.os.Handler
 import android.os.Looper
+import com.example.petlink.ui.auth.LoginActivity
+import com.example.petlink.R
+import com.example.petlink.ui.test.TestActivity
 import org.json.JSONObject
 
 class AnimalDetailActivity : AppCompatActivity() {

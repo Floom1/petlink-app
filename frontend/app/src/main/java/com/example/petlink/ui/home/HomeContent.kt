@@ -1,4 +1,4 @@
-package com.example.petlink
+package com.example.petlink.ui.home
 
 import android.content.Context
 import android.content.Intent
@@ -13,6 +13,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.Glide
+import com.example.petlink.R
 import com.example.petlink.data.model.AnimalPhotoReq
 import com.example.petlink.data.model.AnimalReq
 import com.example.petlink.data.model.BreedReq

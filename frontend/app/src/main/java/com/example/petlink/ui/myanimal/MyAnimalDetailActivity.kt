@@ -1,4 +1,4 @@
-package com.example.petlink
+package com.example.petlink.ui.myanimal
 
 import android.content.Intent
 import android.content.SharedPreferences
@@ -10,6 +10,7 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
+import com.example.petlink.R
 import com.example.petlink.adapter.AnimalPhotoAdapter
 import com.example.petlink.data.model.*
 import com.example.petlink.util.RetrofitClient

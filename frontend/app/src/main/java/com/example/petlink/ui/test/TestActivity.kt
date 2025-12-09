@@ -1,4 +1,4 @@
-package com.example.petlink
+package com.example.petlink.ui.test
 
 import android.os.Bundle
 import android.widget.Button
@@ -7,6 +7,8 @@ import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import com.example.petlink.ui.MainActivity
+import com.example.petlink.R
 import com.example.petlink.data.model.TestResult
 import com.example.petlink.util.RetrofitClient
 import retrofit2.Call

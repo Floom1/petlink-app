@@ -1,4 +1,4 @@
-package com.example.petlink
+package com.example.petlink.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,6 +7,9 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.petlink.ui.MainActivity
+import com.example.petlink.R
+import com.example.petlink.ui.test.TestActivity
 import com.example.petlink.data.model.AuthResponse
 import com.example.petlink.data.model.RegistrationRequest
 import com.example.petlink.util.RetrofitClient

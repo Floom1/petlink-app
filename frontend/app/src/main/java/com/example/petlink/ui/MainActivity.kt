@@ -1,4 +1,4 @@
-package com.example.petlink
+package com.example.petlink.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,10 @@ import android.view.View
 import android.widget.Button
 import android.widget.GridLayout
 import androidx.appcompat.app.AppCompatActivity
+import com.example.petlink.R
+import com.example.petlink.ui.auth.LoginActivity
+import com.example.petlink.ui.home.HomeContent
+import com.example.petlink.ui.test.TestActivity
 import com.example.petlink.util.BottomNavHelper
 import com.example.petlink.util.RetrofitClient
 import com.example.petlink.util.UserSession
