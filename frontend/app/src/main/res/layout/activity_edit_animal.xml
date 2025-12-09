@@ -99,21 +99,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Вид животного"
+                android:layout_marginBottom="5dp"
                 android:textStyle="bold"
                 android:layout_marginTop="12dp"/>
             <Spinner
                 android:id="@+id/spinnerSpecies"
+                android:layout_marginBottom="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
             <TextView
                 android:layout_width="wrap_content"
+                android:layout_marginBottom="5dp"
                 android:layout_height="wrap_content"
                 android:text="Порода"
                 android:textStyle="bold"
                 android:layout_marginTop="12dp"/>
             <Spinner
                 android:id="@+id/spinnerBreed"
+                android:layout_marginBottom="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="false"/>
@@ -121,17 +125,20 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
                 android:text="Имя"/>
             <EditText
                 android:id="@+id/etName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/edittext_rounded_border"
+                android:layout_marginBottom="10dp"
                 android:padding="10dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
                 android:text="Возраст (лет)"/>
             <EditText
                 android:id="@+id/etAge"
@@ -139,6 +146,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
                 android:background="@drawable/edittext_rounded_border"
+                android:layout_marginBottom="10dp"
                 android:padding="10dp"/>
 
             <TextView
@@ -154,12 +162,14 @@
                     android:id="@+id/rbMale"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="30dp"
                     android:text="Мужской"
                     android:buttonTint="#C7F0BD"/>
                 <RadioButton
                     android:id="@+id/rbFemale"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
                     android:text="Женский"
                     android:buttonTint="#C7F0BD"/>
             </RadioGroup>
@@ -167,17 +177,20 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
                 android:text="Цвет"/>
             <EditText
                 android:id="@+id/etColor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/edittext_rounded_border"
+                android:layout_marginBottom="10dp"
                 android:padding="10dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
                 android:text="Описание"/>
             <EditText
                 android:id="@+id/etDescription"
@@ -186,6 +199,7 @@
                 android:minLines="3"
                 android:gravity="top|start"
                 android:background="@drawable/edittext_rounded_border"
+                android:layout_marginBottom="10dp"
                 android:padding="10dp"/>
 
             <CheckBox
@@ -194,6 +208,7 @@
                 android:layout_height="wrap_content"
                 android:text="Бесплатно"
                 android:layout_marginTop="8dp"
+                android:layout_marginBottom="5dp"
                 android:buttonTint="#C7F0BD"/>
             <EditText
                 android:id="@+id/etPrice"
@@ -201,6 +216,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
                 android:background="@drawable/edittext_rounded_border"
+                android:layout_marginBottom="10dp"
                 android:padding="10dp"/>
 
             <CheckBox
@@ -208,33 +224,39 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Стерилизовано"
+                android:layout_marginBottom="10dp"
                 android:buttonTint="#C7F0BD"/>
             <CheckBox
                 android:id="@+id/cbVaccinations"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Есть прививки"
+                android:layout_marginBottom="10dp"
                 android:buttonTint="#C7F0BD"/>
             <CheckBox
                 android:id="@+id/cbHypoallergenic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Гипоаллергенный"
+                android:layout_marginBottom="10dp"
                 android:buttonTint="#C7F0BD"/>
             <CheckBox
                 android:id="@+id/cbChildFriendly"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Дружелюбен к детям"
+                android:layout_marginBottom="10dp"
                 android:buttonTint="#C7F0BD"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
                 android:text="Требования к пространству"/>
             <Spinner
                 android:id="@+id/spinnerSpace"
                 android:layout_width="match_parent"
+                android:layout_marginBottom="10dp"
                 android:layout_height="wrap_content" />
 
             <Button

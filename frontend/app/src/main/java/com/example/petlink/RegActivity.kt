@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.petlink.data.model.AuthResponse
 import com.example.petlink.data.model.RegistrationRequest
 import com.example.petlink.util.RetrofitClient
-
+import com.example.petlink.util.UserSession
 
 class RegActivity : AppCompatActivity() {
 
@@ -29,6 +29,7 @@ class RegActivity : AppCompatActivity() {
         userPasswordConfirm = findViewById(R.id.user_password_confirm)
         val toAuth: TextView = findViewById(R.id.link_to_auth)
         val regButton: Button = findViewById(R.id.button_reg)
+        val skipButton: TextView = findViewById(R.id.button_skip_reg)
 
         toAuth.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
@@ -36,6 +37,12 @@ class RegActivity : AppCompatActivity() {
 
         regButton.setOnClickListener {
             register()
+        }
+
+        skipButton.setOnClickListener {
+            UserSession.enterGuestMode(this)
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
     }
 
@@ -72,6 +79,7 @@ class RegActivity : AppCompatActivity() {
                         val editor = sharedPreferences.edit()
                         editor.putString("auth_token", token)
                         editor.putBoolean("is_logged_in", true)
+                        editor.putBoolean("is_guest_mode", false)
                         editor.apply()
 
                         // Получаем ID пользователя

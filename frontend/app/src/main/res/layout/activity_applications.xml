@@ -44,53 +44,57 @@
                 android:id="@+id/btnAll"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="8dp"
                 android:layout_weight="1"
-                android:maxLines="1"
-                android:singleLine="true"
                 android:ellipsize="end"
                 android:hyphenationFrequency="none"
-                android:text="Все"/>
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Все" />
 
             <Button
                 android:id="@+id/btnSubmitted"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
                 android:layout_weight="1"
-                android:maxLines="1"
-                android:singleLine="true"
                 android:ellipsize="end"
                 android:hyphenationFrequency="none"
-                android:text="Новые"/>
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Новые" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:paddingBottom="8dp">
 
             <Button
                 android:id="@+id/btnApproved"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="8dp"
                 android:layout_weight="1"
-                android:maxLines="1"
-                android:singleLine="true"
                 android:ellipsize="end"
                 android:hyphenationFrequency="none"
-                android:text="Одобренные"/>
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Одобренные" />
 
             <Button
                 android:id="@+id/btnRejected"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
                 android:layout_weight="1"
-                android:maxLines="1"
-                android:singleLine="true"
                 android:ellipsize="end"
                 android:hyphenationFrequency="none"
-                android:text="Отклоненные"/>
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="Отклоненные" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -116,6 +120,30 @@
             android:visibility="gone"
             android:paddingTop="8dp"
             android:textAlignment="center"/>
+
+        <TextView
+            android:id="@+id/guest_hint_applications"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:text="В заявках вы сможете увидеть статус поданных заявок на животных."
+            android:textAlignment="center"
+            android:textColor="#666666"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btn_guest_login_applications"
+            android:layout_width="220dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/btn_stroke_black"
+            android:backgroundTint="@null"
+            android:text="Войти в аккаунт"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            app:backgroundTint="@null"
+            android:visibility="gone" />
 
     </LinearLayout>
 

@@ -4,20 +4,24 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ScrollView
+import android.widget.Toast
+import android.util.Patterns
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.petlink.util.BottomNavHelper
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Toast
-import android.util.Patterns
-import android.widget.Button
 import com.bumptech.glide.Glide
 import com.example.petlink.util.RetrofitClient
 import com.example.petlink.data.model.UploadResponse
 import com.example.petlink.api.PetLinkApi
 import com.example.petlink.data.model.UserResponse
+import com.example.petlink.util.UserSession
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -38,6 +42,23 @@ class ProfileActivity : AppCompatActivity() {
         setContentView(R.layout.activity_profile)
         BottomNavHelper.wire(this)
 
+        val scrollView = findViewById<ScrollView>(R.id.profile_scroll)
+        val guestStub = findViewById<LinearLayout>(R.id.guest_profile_stub)
+        val guestLoginButton = findViewById<Button>(R.id.btn_guest_login_profile)
+
+        val isGuest = UserSession.isGuestMode(this)
+        if (isGuest) {
+            scrollView?.visibility = View.GONE
+            guestStub?.visibility = View.VISIBLE
+
+            guestLoginButton?.setOnClickListener {
+                UserSession.setGuestMode(this, false)
+                startActivity(Intent(this, LoginActivity::class.java))
+                finish()
+            }
+            return
+        }
+
         findViewById<Button>(R.id.button_logout)?.setOnClickListener {
             logout()
         }
@@ -46,7 +67,6 @@ class ProfileActivity : AppCompatActivity() {
             saveProfile()
         }
 
-        // gallery picker for new photo
         pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             if (uri != null) {
                 handlePickedImage(uri)
@@ -86,7 +106,6 @@ class ProfileActivity : AppCompatActivity() {
         val imageView = findViewById<ImageView>(R.id.imageView)
         imageView?.let { Glide.with(this).load(uri).centerCrop().into(it) }
 
-        // create temp file from uri
         val tempFile = uriToTempFile(uri) ?: run {
             Toast.makeText(this, "Не удалось прочитать файл", Toast.LENGTH_SHORT).show()
             return
@@ -104,7 +123,6 @@ class ProfileActivity : AppCompatActivity() {
                     }
                     val url = response.body()?.url
                     if (!url.isNullOrEmpty()) {
-                        // update user profile photo_url
                         val fields = mapOf<String, Any?>("photo_url" to url)
                         RetrofitClient.apiService.updateUser("Token $token", userId, fields)
                             .enqueue(object: Callback<UserResponse> {

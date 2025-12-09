@@ -140,11 +140,22 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="24dp"
-                android:layout_marginBottom="50dp"
                 android:fontFamily="sans-serif"
                 android:text="Перейти к авторизации"
                 android:textColor="#000"
                 android:textSize="17dp" />
+
+            <TextView
+                android:id="@+id/button_skip_reg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="50dp"
+                android:fontFamily="sans-serif"
+                android:text="Пропустить"
+                android:textColor="#000000"
+                android:textSize="15sp" />
 
         </LinearLayout>
     </ScrollView>

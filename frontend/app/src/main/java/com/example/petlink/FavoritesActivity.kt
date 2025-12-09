@@ -1,8 +1,10 @@
 package com.example.petlink
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
 import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -15,6 +17,7 @@ import com.example.petlink.data.model.AnimalReq
 import com.example.petlink.data.model.StatusReq
 import com.example.petlink.util.BottomNavHelper
 import com.example.petlink.util.RetrofitClient
+import com.example.petlink.util.UserSession
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,6 +27,8 @@ class FavoritesActivity : AppCompatActivity() {
     private lateinit var grid: GridLayout
     private lateinit var progress: ProgressBar
     private lateinit var emptyView: TextView
+    private lateinit var guestHint: TextView
+    private lateinit var guestLoginButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +38,8 @@ class FavoritesActivity : AppCompatActivity() {
         grid = findViewById(R.id.grid_placeholder)
         progress = findViewById(R.id.progress)
         emptyView = findViewById(R.id.emptyView)
+        guestHint = findViewById(R.id.guest_hint_favorites)
+        guestLoginButton = findViewById(R.id.btn_guest_login_favorites)
 
         loadFavorites()
     }
@@ -45,12 +52,31 @@ class FavoritesActivity : AppCompatActivity() {
     private fun loadFavorites() {
         val sp = getSharedPreferences("user_session", MODE_PRIVATE)
         val token = sp.getString("auth_token", null)
+        val isGuest = UserSession.isGuestMode(this)
+
         if (token.isNullOrEmpty()) {
             grid.removeAllViews()
             progress.visibility = View.GONE
             emptyView.visibility = View.VISIBLE
-            emptyView.text = "Войдите, чтобы увидеть избранное"
-            Toast.makeText(this, "Требуется вход", Toast.LENGTH_SHORT).show()
+
+            if (isGuest) {
+                emptyView.text = "Авторизуйтесь для доступа к избранному"
+                val container = findViewById<android.widget.LinearLayout>(R.id.favorites_container)
+                container?.gravity = android.view.Gravity.CENTER_HORIZONTAL or android.view.Gravity.CENTER_VERTICAL
+                guestHint.visibility = View.VISIBLE
+                guestLoginButton.visibility = View.VISIBLE
+                guestLoginButton.setOnClickListener {
+                    UserSession.setGuestMode(this, false)
+                    startActivity(Intent(this, LoginActivity::class.java))
+                    finish()
+                }
+//                Toast.makeText(this, "Войдите в аккаунт, чтобы использовать избранное", Toast.LENGTH_SHORT).show()
+            } else {
+                emptyView.text = "Войдите, чтобы увидеть избранное"
+                guestHint.visibility = View.GONE
+                guestLoginButton.visibility = View.GONE
+                Toast.makeText(this, "Требуется вход", Toast.LENGTH_SHORT).show()
+            }
             return
         }
 

@@ -27,6 +27,8 @@ import com.example.petlink.util.RetrofitClient
 import com.example.petlink.data.model.AnimalApplication
 import com.example.petlink.data.model.AnimalApplicationCreate
 import android.text.InputFilter
+import android.os.Handler
+import android.os.Looper
 import org.json.JSONObject
 
 class AnimalDetailActivity : AppCompatActivity() {
@@ -66,19 +68,21 @@ class AnimalDetailActivity : AppCompatActivity() {
         // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
 
+        val isGuest = com.example.petlink.util.UserSession.isGuestMode(this)
+        if (isGuest) {
+            btnApply.visibility = View.GONE
+            btnFavorite.visibility = View.GONE
+        }
 
-        // Initialize Retrofit
         api = RetrofitClient.apiService
         fetchCurrentUser()
         // Load animal details
         loadAnimalDetails()
 
-        // Set up favorite button click listener
         btnFavorite.setOnClickListener {
             toggleFavorite()
         }
 
-        // Set up apply button click listener
         btnApply.setOnClickListener {
             handleApplyButtonClick()
         }
@@ -110,14 +114,17 @@ class AnimalDetailActivity : AppCompatActivity() {
         progressBar.visibility = View.VISIBLE
 
         val token = sharedPreferences.getString("auth_token", null)
-        if (token == null || token.isEmpty()) {
+        val isGuest = com.example.petlink.util.UserSession.isGuestMode(this)
+
+        if (token.isNullOrEmpty() && !isGuest) {
             Toast.makeText(this, "Необходимо войти в аккаунт", Toast.LENGTH_SHORT).show()
             progressBar.visibility = View.GONE
             return
         }
 
-        // Загружаем основные данные животного
-        api?.getAnimalDetail("Token $token", animalId)?.enqueue(object : Callback<AnimalSimpleResponse> {
+        val authHeader = if (token.isNullOrEmpty()) null else "Token $token"
+
+        api?.getAnimalDetail(authHeader, animalId)?.enqueue(object : Callback<AnimalSimpleResponse> {
             override fun onResponse(
                 call: Call<AnimalSimpleResponse>,
                 response: Response<AnimalSimpleResponse>
@@ -239,23 +246,18 @@ class AnimalDetailActivity : AppCompatActivity() {
         breed: BreedReq?,
         photos: List<AnimalPhotoReq>
     ) {
-        // Set animal name
         tvAnimalName.text = animal.name ?: "Без имени"
 
-        // Set price (if null or 0 - show "Бесплатно")
         tvPrice.text = if (animal.price == null || animal.price == 0.0) {
             "Бесплатно"
         } else {
             "${animal.price} руб."
         }
 
-        // Set description
         tvDescription.text = animal.description ?: "Описание отсутствует"
 
-        // Set breed
         tvBreed.text = breed?.name ?: "Не указано"
 
-        // Set age
         if (animal.age != null) {
             tvAge.text = formatAge(animal.age)
             tvAge.visibility = View.VISIBLE
@@ -265,17 +267,14 @@ class AnimalDetailActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.tvAgeLabel).visibility = View.GONE
         }
 
-        // Set gender
         tvGender.text = when (animal.gender) {
             "M" -> "Мужской"
             "F" -> "Женский"
             else -> "Не указан"
         }
 
-        // Set color
         tvColor.text = animal.color ?: "Не указан"
 
-        // Set habits
         if (animal.habits != null) {
             tvHabits.text = animal.habits
             tvHabits.visibility = View.VISIBLE
@@ -285,7 +284,6 @@ class AnimalDetailActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.tvHabitsLabel).visibility = View.GONE
         }
 
-        // Set seller info
         if (user != null) {
             tvSellerName.text = if (user.is_shelter == true) {
                 user.shelter_name ?: user.full_name ?: "Не указано"
@@ -296,13 +294,10 @@ class AnimalDetailActivity : AppCompatActivity() {
             tvSellerName.text = "Не указано"
         }
 
-        // Setup photo ViewPager
         setupPhotoViewPager(photos)
 
-        // Generate tags
         generateTags(animal)
 
-        // Favorite state
         isFavorite = animal.is_favorite == true
         updateFavoriteIcon()
     }
@@ -327,10 +322,8 @@ class AnimalDetailActivity : AppCompatActivity() {
         val adapter = AnimalPhotoAdapter(photos)
         viewPager.adapter = adapter
 
-        // Setup indicator
         setupIndicator(photos.size)
 
-        // Update indicator when page changes
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(
                 position: Int,
@@ -418,7 +411,6 @@ class AnimalDetailActivity : AppCompatActivity() {
             "high" -> tags.add("Высокие требования к пространству")
         }
 
-        // Create tags layout (2 per row)
         val tagLayoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
@@ -430,7 +422,6 @@ class AnimalDetailActivity : AppCompatActivity() {
 
         tags.forEachIndexed { index, tagText ->
             if (index % 2 == 0) {
-                // Create new row
                 currentRow = LinearLayout(this).apply {
                     orientation = LinearLayout.HORIZONTAL
                     layoutParams = LinearLayout.LayoutParams(
@@ -441,7 +432,6 @@ class AnimalDetailActivity : AppCompatActivity() {
                 tagsContainer.addView(currentRow)
             }
 
-            // Create tag view
             val tagView = TextView(this).apply {
                 text = tagText
                 setPadding(16, 8, 16, 8)
@@ -477,8 +467,9 @@ class AnimalDetailActivity : AppCompatActivity() {
 
     private fun toggleFavorite() {
         val token = sharedPreferences.getString("auth_token", null)
-        if (token.isNullOrEmpty()) {
-            Toast.makeText(this, "Требуется вход", Toast.LENGTH_SHORT).show()
+        val isGuest = com.example.petlink.util.UserSession.isGuestMode(this)
+        if (isGuest || token.isNullOrEmpty()) {
+            redirectGuestToLoginWithDelay()
             return
         }
 
@@ -507,7 +498,7 @@ class AnimalDetailActivity : AppCompatActivity() {
                             isFavorite = body.is_favorite == true
                             updateFavoriteIcon()
                         }
-                        Toast.makeText(this@AnimalDetailActivity, "Добавлено в избранное", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@AnimalDetailActivity, "Объявление добавлено в избранное", Toast.LENGTH_SHORT).show()
                     }
 
                     override fun onFailure(call: Call<AnimalSimpleResponse>, t: Throwable) {
@@ -540,7 +531,7 @@ class AnimalDetailActivity : AppCompatActivity() {
 
     private fun showUndoFavoriteDialog() {
         AlertDialog.Builder(this)
-            .setMessage("Удалено из избранного")
+            .setMessage("Объявление удалено из избранного")
             .setPositiveButton("Отменить") { _, _ ->
                 val token = sharedPreferences.getString("auth_token", null) ?: return@setPositiveButton
                 val authHeader = "Token $token"
@@ -580,8 +571,9 @@ class AnimalDetailActivity : AppCompatActivity() {
 
     private fun handleApplyButtonClick() {
         val token = sharedPreferences.getString("auth_token", null)
-        if (token.isNullOrEmpty()) {
-            Toast.makeText(this, "Требуется вход", Toast.LENGTH_SHORT).show()
+        val isGuest = com.example.petlink.util.UserSession.isGuestMode(this)
+        if (isGuest || token.isNullOrEmpty()) {
+            redirectGuestToLoginWithDelay()
             return
         }
 
@@ -664,7 +656,6 @@ class AnimalDetailActivity : AppCompatActivity() {
                         }
 
                         override fun onFailure(callCheck: Call<List<AnimalApplication>>, t: Throwable) {
-                            // Если не смогли проверить, всё равно предложим форму, а дубль отловит сервер
                             val dialogView = layoutInflater.inflate(R.layout.dialog_application_confirm, null)
                             val etMessage = dialogView.findViewById<EditText>(R.id.etMessageConfirm)
                             etMessage.filters = arrayOf(InputFilter.LengthFilter(500))
@@ -711,5 +702,17 @@ class AnimalDetailActivity : AppCompatActivity() {
                 Toast.makeText(this@AnimalDetailActivity, "Сеть недоступна: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+    private fun redirectGuestToLoginWithDelay() {
+        Toast.makeText(
+            this,
+            "Войдите в аккаунт, чтобы использовать эту функцию",
+            Toast.LENGTH_SHORT
+        ).show()
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+        }, 2000)
     }
 }

@@ -9,6 +9,7 @@
     <include layout="@layout/toolbar" />
 
     <LinearLayout
+        android:id="@+id/favorites_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -51,6 +52,30 @@
             android:visibility="gone"
             android:paddingTop="8dp"
             android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/guest_hint_favorites"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:text="Зарегистрируйтесь, чтобы сохранять понравившихся животных и быстро находить их позже."
+            android:textAlignment="center"
+            android:textColor="#666666"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btn_guest_login_favorites"
+            android:layout_width="220dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/btn_stroke_black"
+            android:backgroundTint="@null"
+            android:text="Войти в аккаунт"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            app:backgroundTint="@null"
+            android:visibility="gone" />
 
     </LinearLayout>
 

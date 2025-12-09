@@ -2,28 +2,29 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#C7F0BD"
-    android:paddingTop="26dp"
-    android:paddingBottom="11dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="0dp"
     android:paddingHorizontal="4dp"
     android:layout_marginBottom="10dp"
     android:orientation="horizontal"
     xmlns:android="http://schemas.android.com/apk/res/android">
-<ImageView
-    android:id="@+id/rbg3hto0e0f"
-    android:layout_width="68dp"
-    android:layout_height="68dp"
-    android:layout_marginEnd="12dp"
-    android:src="@drawable/logo"
-    android:scaleType="fitXY"
-    />
-<TextView
-    android:id="@+id/rt8qjc2wc9s"
-    android:textColor="#000000"
-    android:textSize="24sp"
-    android:layout_marginTop="27dp"
-    android:layout_marginBottom="12dp"
-    android:layout_height="wrap_content"
-    android:layout_width="wrap_content"
-    android:text="PetLink"
-    />
+
+    <ImageView
+        android:id="@+id/rbg3hto0e0f"
+        android:layout_width="68dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="12dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/logo" />
+
+    <TextView
+        android:id="@+id/rt8qjc2wc9s"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="27dp"
+        android:layout_marginBottom="12dp"
+        android:fontFamily="sans-serif"
+        android:text="PetLink"
+        android:textColor="#000000"
+        android:textSize="26sp" />
 </LinearLayout>

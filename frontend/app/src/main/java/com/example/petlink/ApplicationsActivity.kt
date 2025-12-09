@@ -1,5 +1,6 @@
 package com.example.petlink
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -13,6 +14,7 @@ import com.example.petlink.adapter.ApplicationAdapter
 import com.example.petlink.data.model.AnimalApplication
 import com.example.petlink.util.RetrofitClient
 import com.example.petlink.util.BottomNavHelper
+import com.example.petlink.util.UserSession
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -25,6 +27,8 @@ class ApplicationsActivity : AppCompatActivity() {
     private lateinit var btnSubmitted: Button
     private lateinit var btnApproved: Button
     private lateinit var btnRejected: Button
+    private lateinit var guestHint: TextView
+    private lateinit var guestLoginButton: Button
 
     private var role: String = "seller" // seller | buyer
     private var currentStatus: String? = null
@@ -43,6 +47,8 @@ class ApplicationsActivity : AppCompatActivity() {
         recycler = findViewById(R.id.recycler)
         progress = findViewById(R.id.progress)
         emptyView = findViewById(R.id.emptyView)
+        guestHint = findViewById(R.id.guest_hint_applications)
+        guestLoginButton = findViewById(R.id.btn_guest_login_applications)
         btnAll = findViewById(R.id.btnAll)
         btnSubmitted = findViewById(R.id.btnSubmitted)
         btnApproved = findViewById(R.id.btnApproved)
@@ -73,8 +79,33 @@ class ApplicationsActivity : AppCompatActivity() {
     private fun loadData() {
         val sp = getSharedPreferences("user_session", MODE_PRIVATE)
         val token = sp.getString("auth_token", null)
+        val isGuest = UserSession.isGuestMode(this)
         if (token.isNullOrEmpty()) {
-            Toast.makeText(this, "Требуется вход", Toast.LENGTH_SHORT).show()
+            progress.visibility = View.GONE
+            recycler.visibility = View.GONE
+            emptyView.visibility = View.VISIBLE
+
+            if (isGuest) {
+                emptyView.text = "Авторизуйтесь для доступа к заявкам"
+                findViewById<Button>(R.id.btnBackScreen)?.visibility = View.GONE
+                btnAll.visibility = View.GONE
+                btnSubmitted.visibility = View.GONE
+                btnApproved.visibility = View.GONE
+                btnRejected.visibility = View.GONE
+                guestHint.visibility = View.VISIBLE
+                guestLoginButton.visibility = View.VISIBLE
+                guestLoginButton.setOnClickListener {
+                    UserSession.setGuestMode(this, false)
+                    startActivity(Intent(this, LoginActivity::class.java))
+                    finish()
+                }
+//                Toast.makeText(this, "Войдите в аккаунт, чтобы просматривать заявки", Toast.LENGTH_SHORT).show()
+            } else {
+                emptyView.text = "Войдите, чтобы просматривать заявки"
+                guestHint.visibility = View.GONE
+                guestLoginButton.visibility = View.GONE
+                Toast.makeText(this, "Требуется вход", Toast.LENGTH_SHORT).show()
+            }
             return
         }
         progress.visibility = View.VISIBLE

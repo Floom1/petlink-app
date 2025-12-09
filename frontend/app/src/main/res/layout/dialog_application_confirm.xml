@@ -68,10 +68,10 @@
             android:id="@+id/etMessageConfirm"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:hint="Напишите сообщение продавцу (необязательно)"
+            android:hint="Напишите сообщение продавцу (опционально)"
             android:maxLength="500"
             android:gravity="top|start"
-            android:background="@android:drawable/edit_text"
+            android:background="@drawable/edittext_rounded_border"
             android:layout_marginTop="12dp"
             android:padding="8dp"/>
 

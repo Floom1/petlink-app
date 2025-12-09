@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.petlink.data.model.AuthResponse
 import com.example.petlink.data.model.LoginRequest
 import com.example.petlink.util.RetrofitClient
+import com.example.petlink.util.UserSession
+
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -30,10 +32,17 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
+        if (UserSession.isGuestMode(this)) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+            return
+        }
+
         userEmail = findViewById(R.id.user_login_auth)
         userPass = findViewById(R.id.user_pass_auth)
         val toReg: TextView = findViewById(R.id.link_to_reg)
         val loginButton: Button = findViewById(R.id.button_auth)
+        val skipButton: TextView = findViewById(R.id.button_skip_auth)
 
         toReg.setOnClickListener {
             startActivity(Intent(this, RegActivity::class.java))
@@ -41,6 +50,12 @@ class LoginActivity : AppCompatActivity() {
 
         loginButton.setOnClickListener {
             login()
+        }
+
+        skipButton.setOnClickListener {
+            UserSession.enterGuestMode(this)
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
     }
 
@@ -63,9 +78,9 @@ class LoginActivity : AppCompatActivity() {
                     val editor = sharedPreferences.edit()
                     editor.putString("auth_token", token)
                     editor.putBoolean("is_logged_in", true)
+                    editor.putBoolean("is_guest_mode", false)
                     editor.apply()
 
-                    // Получаем ID пользователя и затем проверяем тест
                     if (!token.isNullOrEmpty()) {
                         RetrofitClient.apiService.me("Token $token").enqueue(object: Callback<com.example.petlink.data.model.UserResponse> {
                             override fun onResponse(call2: Call<com.example.petlink.data.model.UserResponse>, resp: Response<com.example.petlink.data.model.UserResponse>) {
@@ -103,15 +118,12 @@ class LoginActivity : AppCompatActivity() {
             RetrofitClient.apiService.getMyRecommendations("Token $token").enqueue(object : Callback<Map<String, Any>> {
                 override fun onResponse(call: Call<Map<String, Any>>, response: Response<Map<String, Any>>) {
                     if (response.isSuccessful) {
-                        // Тест пройден, открываем главную страницу
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                         finish()
                     } else if (response.code() == 404) {
-                        // Тест не пройден, открываем страницу теста
                         startActivity(Intent(this@LoginActivity, TestActivity::class.java))
                         finish()
                     } else {
-                        // Другая ошибка, открываем главную страницу
                         Toast.makeText(this@LoginActivity, "Ошибка проверки теста", Toast.LENGTH_SHORT).show()
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                         finish()
@@ -119,7 +131,6 @@ class LoginActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<Map<String, Any>>, t: Throwable) {
-                    // Ошибка сети, открываем главную страницу
                     Toast.makeText(this@LoginActivity, "Ошибка сети: ${t.message}", Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                     finish()

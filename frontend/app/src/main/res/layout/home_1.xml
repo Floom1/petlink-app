@@ -62,6 +62,7 @@
                             app:backgroundTint="@null" />
 
                         <ImageView
+                            android:id="@+id/filter_png"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_alignStart="@id/btn_filters"

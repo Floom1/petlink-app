@@ -41,6 +41,7 @@ class HomeContent {
         spaceRequirements: String? = null
     ) {
         val filtersPanel = (grid.parent as? View)?.rootView?.findViewById<LinearLayout>(R.id.filters_panel)
+        val filterPng = (grid.parent as? View)?.rootView?.findViewById<ImageView>(R.id.filter_png)
         val btnFilters = (grid.parent as? View)?.rootView?.findViewById<Button>(R.id.btn_filters)
         val btnApply = (grid.parent as? View)?.rootView?.findViewById<Button>(R.id.btn_apply_filters)
         val btnClear = (grid.parent as? View)?.rootView?.findViewById<Button>(R.id.btn_clear_filters)
@@ -328,7 +329,7 @@ class HomeContent {
                         val animals = firstRecommendation["animals"] as? List<String>
 
                         val animalsList = animals?.joinToString(", ") ?: "Не указаны"
-                        val fullMessage = "Шаблон #$templateId\n$message\n\nРекомендуемые породы: $animalsList"
+                        val fullMessage = "$message\n\nРекомендуемые породы: $animalsList"
 
                         val dialog = android.app.AlertDialog.Builder(context)
                             .setMessage(fullMessage)
