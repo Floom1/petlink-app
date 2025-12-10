@@ -377,6 +377,7 @@ class AnimalApplication(models.Model):
     risk_info = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+    approved_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return f"Заявка на {self.animal.name} от {self.user.email}"

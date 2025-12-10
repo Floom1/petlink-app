@@ -11,9 +11,11 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.Toast
 import android.util.Patterns
+import android.os.Environment
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
 import com.example.petlink.util.BottomNavHelper
 import com.bumptech.glide.Glide
 import com.example.petlink.ui.applications.ApplicationsActivity
@@ -28,14 +30,17 @@ import com.example.petlink.util.UserSession
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
+import java.util.Calendar
 
 class ProfileActivity : AppCompatActivity() {
     private lateinit var pickImageLauncher: ActivityResultLauncher<String>
+    private var currentUser: UserResponse? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,6 +102,8 @@ class ProfileActivity : AppCompatActivity() {
         findViewById<Button>(R.id.button_my_ads)?.setOnClickListener {
             startActivity(Intent(this, MyAdsActivity::class.java))
         }
+
+        findViewById<Button>(R.id.button_stats)?.visibility = View.GONE
 
         loadUser()
     }
@@ -207,12 +214,176 @@ class ProfileActivity : AppCompatActivity() {
                         Glide.with(this@ProfileActivity).load(R.drawable.cat).centerCrop().into(imageView)
                     }
                 }
+
+                currentUser = user
+
+                val statsButton = findViewById<Button>(R.id.button_stats)
+                if (user.is_shelter) {
+                    statsButton?.visibility = View.VISIBLE
+                    statsButton?.setOnClickListener {
+                        showStatsTypeDialog()
+                    }
+                } else {
+                    statsButton?.visibility = View.GONE
+                }
             }
 
             override fun onFailure(call: Call<UserResponse>, t: Throwable) {
                 Toast.makeText(this@ProfileActivity, "Сеть недоступна: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun showStatsTypeDialog() {
+        val user = currentUser
+        if (user == null || !user.is_shelter) {
+            Toast.makeText(this, "Функция доступна только для приютов", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val options = arrayOf("Проданные животные", "Купленные животные")
+        AlertDialog.Builder(this)
+            .setTitle("Выберите тип отчёта")
+            .setItems(options) { _, which ->
+                val reportType = if (which == 0) "sold" else "bought"
+                showPeriodTypeDialog(reportType)
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
+
+    private fun showPeriodTypeDialog(reportType: String) {
+        val options = arrayOf("За год", "За месяц")
+        AlertDialog.Builder(this)
+            .setTitle("Выберите период")
+            .setItems(options) { _, which ->
+                val periodType = if (which == 0) "year" else "month"
+                showYearDialog(reportType, periodType)
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
+
+    private fun showYearDialog(reportType: String, periodType: String) {
+        val calendar = Calendar.getInstance()
+        val currentYear = calendar.get(Calendar.YEAR)
+        val years = arrayOf(currentYear.toString(), (currentYear - 1).toString())
+
+        AlertDialog.Builder(this)
+            .setTitle("Выберите год")
+            .setItems(years) { _, which ->
+                val selectedYear = years[which].toInt()
+                if (periodType == "year") {
+                    startDownloadStats(reportType, periodType, selectedYear, null)
+                } else {
+                    showMonthDialog(reportType, selectedYear)
+                }
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
+
+    private fun showMonthDialog(reportType: String, year: Int) {
+        val calendar = Calendar.getInstance()
+        val currentYear = calendar.get(Calendar.YEAR)
+        val currentMonth = calendar.get(Calendar.MONTH) + 1
+        val maxMonth = if (year == currentYear) currentMonth else 12
+
+        val monthValues = (1..maxMonth).toList()
+        val monthLabels = monthValues.map { m -> if (m < 10) "0$m" else m.toString() }.toTypedArray()
+
+        AlertDialog.Builder(this)
+            .setTitle("Выберите месяц")
+            .setItems(monthLabels) { _, which ->
+                val month = monthValues[which]
+                startDownloadStats(reportType, "month", year, month)
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
+
+    private fun startDownloadStats(reportType: String, periodType: String, year: Int, month: Int?) {
+        val user = currentUser
+        if (user == null || !user.is_shelter) {
+            Toast.makeText(this, "Функция доступна только для приютов", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val sp = getSharedPreferences("user_session", MODE_PRIVATE)
+        val token = sp.getString("auth_token", null)
+        if (token.isNullOrEmpty()) {
+            Toast.makeText(this, "Требуется вход", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val progress = findViewById<android.widget.ProgressBar>(R.id.stats_progress)
+        progress?.visibility = View.VISIBLE
+
+        val call: Call<ResponseBody> = if (reportType == "sold") {
+            RetrofitClient.apiService.getShelterSoldStats("Token $token", periodType, year, month)
+        } else {
+            RetrofitClient.apiService.getShelterBoughtStats("Token $token", periodType, year, month)
+        }
+
+        call.enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                progress?.visibility = View.GONE
+
+                if (!response.isSuccessful) {
+                    when (response.code()) {
+                        404 -> Toast.makeText(this@ProfileActivity, "Нет данных за выбранный период", Toast.LENGTH_SHORT).show()
+                        400 -> Toast.makeText(this@ProfileActivity, "Ошибка параметров запроса", Toast.LENGTH_SHORT).show()
+                        403 -> Toast.makeText(this@ProfileActivity, "Доступно только для приютов", Toast.LENGTH_SHORT).show()
+                        else -> Toast.makeText(this@ProfileActivity, "Ошибка генерации отчёта", Toast.LENGTH_SHORT).show()
+                    }
+                    return
+                }
+
+                saveReportToFile(response.body(), reportType, periodType, year, month)
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                progress?.visibility = View.GONE
+                Toast.makeText(this@ProfileActivity, "Ошибка соединения: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun saveReportToFile(body: ResponseBody?, reportType: String, periodType: String, year: Int, month: Int?) {
+        if (body == null) {
+            Toast.makeText(this, "Пустой ответ сервера", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val user = currentUser
+        val shelterTitle = user?.shelter_name ?: user?.full_name ?: "Shelter"
+        val safeTitle = shelterTitle.replace(" ", "_")
+        val prefix = if (reportType == "sold") "Проданные" else "Купленные"
+        val fileName = if (periodType == "month" && month != null) {
+            String.format("%s_%02d_%d_%s.csv", prefix, month, year, safeTitle)
+        } else {
+            String.format("%s_%d_%s.csv", prefix, year, safeTitle)
+        }
+
+        try {
+            val bytes = body.bytes()
+            val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            if (dir == null) {
+                Toast.makeText(this, "Не удалось получить директорию загрузок", Toast.LENGTH_SHORT).show()
+                return
+            }
+            if (!dir.exists()) {
+                dir.mkdirs()
+            }
+            val file = File(dir, fileName)
+            FileOutputStream(file).use { out ->
+                out.write(bytes)
+                out.flush()
+            }
+            Toast.makeText(this, "Отчёт сохранён в Загрузки: $fileName", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Ошибка сохранения файла", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun saveProfile() {

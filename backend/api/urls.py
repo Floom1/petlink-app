@@ -16,6 +16,7 @@ router.register(r'tests', views.TestResultViewSet)
 router.register(r'animal_apps', views.AnimalApplicationViewSet)
 router.register(r'service_apps', views.ServiceApplicationViewSet)
 router.register(r'notifications', views.NotificationViewSet, basename='notification')
+router.register(r'shelter-stats', views.ShelterStatsViewSet, basename='shelter-stats')
 
 
 

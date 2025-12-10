@@ -1,5 +1,8 @@
 import os
+import csv
+from datetime import date
 from django.conf import settings
+from django.http import HttpResponse
 from rest_framework import viewsets, generics, permissions
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
@@ -313,7 +316,157 @@ class AnimalApplicationViewSet(viewsets.ModelViewSet):
             except Exception:
                 pass
 
+            try:
+                if instance.approved_at is None:
+                    from django.utils import timezone
+                    instance.approved_at = timezone.now()
+                    instance.save(update_fields=['approved_at'])
+            except Exception:
+                pass
+
         return Response(serializer.data)
+
+
+class ShelterStatsViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def _validate_period(self, request):
+        period_type = request.query_params.get('period_type')
+        year_param = request.query_params.get('year')
+        month_param = request.query_params.get('month')
+
+        if period_type not in ('year', 'month'):
+            return None, Response({'detail': 'period_type должен быть "year" или "month"'}, status=400)
+
+        try:
+            year = int(year_param) if year_param is not None else None
+        except (TypeError, ValueError):
+            return None, Response({'detail': 'year должен быть числом'}, status=400)
+
+        if year is None:
+            return None, Response({'detail': 'Параметр year обязателен'}, status=400)
+
+        today = date.today()
+        allowed_years = (today.year, today.year - 1)
+        if year not in allowed_years:
+            return None, Response({'detail': 'Можно выбрать только текущий или предыдущий год'}, status=400)
+
+        month = None
+        if period_type == 'month':
+            try:
+                month = int(month_param) if month_param is not None else None
+            except (TypeError, ValueError):
+                return None, Response({'detail': 'month должен быть числом'}, status=400)
+
+            if month is None:
+                return None, Response({'detail': 'Параметр month обязателен для period_type="month"'}, status=400)
+
+            if month < 1 or month > 12:
+                return None, Response({'detail': 'month должен быть в диапазоне 1-12'}, status=400)
+
+            if year == today.year and month > today.month:
+                return None, Response({'detail': 'Нельзя запрашивать период в будущем'}, status=400)
+
+        return {'period_type': period_type, 'year': year, 'month': month}, None
+
+    def _build_filename(self, prefix, user, year, month=None):
+        shelter_title = user.shelter_name or user.full_name or 'Shelter'
+        safe_title = shelter_title.replace(' ', '_')
+        if month is not None:
+            return f"{prefix}_{month:02d}_{year}_{safe_title}.csv"
+        return f"{prefix}_{year}_{safe_title}.csv"
+
+    def _build_response(self, filename, rows, header):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        writer = csv.writer(response)
+        writer.writerow(header)
+        for row in rows:
+            writer.writerow(row)
+        return response
+
+    @action(detail=False, methods=['get'], url_path='sold')
+    def sold(self, request):
+        user = request.user
+        if not user.is_shelter:
+            return Response({'detail': 'Доступно только для пользователей-приютов'}, status=403)
+
+        period, error_response = self._validate_period(request)
+        if error_response is not None:
+            return error_response
+
+        qs = AnimalApplication.objects.filter(status='approved', animal__user=user)
+        if period['period_type'] == 'year':
+            qs = qs.filter(approved_at__year=period['year'])
+        else:
+            qs = qs.filter(approved_at__year=period['year'], approved_at__month=period['month'])
+
+        if not qs.exists():
+            return Response({'detail': 'Нет данных за выбранный период'}, status=404)
+
+        qs = qs.select_related('animal', 'animal__breed', 'animal__breed__species', 'user')
+
+        rows = []
+        for app in qs:
+            animal = app.animal
+            breed = getattr(animal, 'breed', None)
+            species = getattr(breed, 'species', None) if breed is not None else None
+            rows.append([
+                app.id,
+                app.approved_at.isoformat() if app.approved_at else '',
+                getattr(animal, 'name', ''),
+                getattr(species, 'name', ''),
+                getattr(breed, 'name', ''),
+                str(getattr(animal, 'price', '') or ''),
+                app.user.shelter_name or app.user.full_name,
+                app.user.email,
+            ])
+
+        filename = self._build_filename('Проданные', user, period['year'], period['month'])
+        header = ['ID заявки', 'Дата одобрения', 'Животное', 'Вид', 'Порода', 'Цена', 'Покупатель', 'Email покупателя']
+        return self._build_response(filename, rows, header)
+
+    @action(detail=False, methods=['get'], url_path='bought')
+    def bought(self, request):
+        user = request.user
+        if not user.is_shelter:
+            return Response({'detail': 'Доступно только для пользователей-приютов'}, status=403)
+
+        period, error_response = self._validate_period(request)
+        if error_response is not None:
+            return error_response
+
+        qs = AnimalApplication.objects.filter(status='approved', user=user)
+        if period['period_type'] == 'year':
+            qs = qs.filter(approved_at__year=period['year'])
+        else:
+            qs = qs.filter(approved_at__year=period['year'], approved_at__month=period['month'])
+
+        if not qs.exists():
+            return Response({'detail': 'Нет данных за выбранный период'}, status=404)
+
+        qs = qs.select_related('animal', 'animal__breed', 'animal__breed__species', 'animal__user')
+
+        rows = []
+        for app in qs:
+            animal = app.animal
+            breed = getattr(animal, 'breed', None)
+            species = getattr(breed, 'species', None) if breed is not None else None
+            seller = animal.user
+            rows.append([
+                app.id,
+                app.approved_at.isoformat() if app.approved_at else '',
+                getattr(animal, 'name', ''),
+                getattr(species, 'name', ''),
+                getattr(breed, 'name', ''),
+                str(getattr(animal, 'price', '') or ''),
+                seller.shelter_name or seller.full_name,
+                seller.email,
+            ])
+
+        filename = self._build_filename('Купленные', user, period['year'], period['month'])
+        header = ['ID заявки', 'Дата одобрения', 'Животное', 'Вид', 'Порода', 'Цена', 'Продавец', 'Email продавца']
+        return self._build_response(filename, rows, header)
 
 
 class ServiceApplicationViewSet(viewsets.ModelViewSet):

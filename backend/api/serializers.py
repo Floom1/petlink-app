@@ -195,8 +195,8 @@ class AnimalApplicationSerializer(serializers.ModelSerializer):
     buyer_name = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = AnimalApplication
-        fields = ['id', 'animal', 'user', 'message', 'status', 'risk_info', 'created_at', 'updated_at', 'animal_name', 'buyer_name']
-        read_only_fields = ('id', 'user', 'risk_info', 'created_at', 'updated_at', 'animal_name', 'buyer_name')
+        fields = ['id', 'animal', 'user', 'message', 'status', 'risk_info', 'created_at', 'updated_at', 'approved_at', 'animal_name', 'buyer_name']
+        read_only_fields = ('id', 'user', 'risk_info', 'created_at', 'updated_at', 'approved_at', 'animal_name', 'buyer_name')
 
     def get_risks(self, obj):
         return obj.generate_risks()

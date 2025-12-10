@@ -18,6 +18,7 @@ import com.example.petlink.data.model.NotificationItem
 
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -214,5 +215,21 @@ interface PetLinkApi {
         @Header("Authorization") authHeader: String,
         @Path("id") id: Int
     ): Call<Void>
+
+    @GET("api/shelter-stats/sold/")
+    fun getShelterSoldStats(
+        @Header("Authorization") authHeader: String,
+        @Query("period_type") periodType: String,
+        @Query("year") year: Int,
+        @Query("month") month: Int? = null
+    ): Call<ResponseBody>
+
+    @GET("api/shelter-stats/bought/")
+    fun getShelterBoughtStats(
+        @Header("Authorization") authHeader: String,
+        @Query("period_type") periodType: String,
+        @Query("year") year: Int,
+        @Query("month") month: Int? = null
+    ): Call<ResponseBody>
 
 }
