@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class CustomUserManager(BaseUserManager):
@@ -442,3 +444,59 @@ class ServiceApplication(models.Model):
 
     def __str__(self):
         return f"Заявка на {self.service.name} от {self.user.email}"
+
+
+class Notification(models.Model):
+    TYPE_NEW_APPLICATION = 'NEW_APPLICATION'
+
+    NOTIFICATION_TYPE_CHOICES = [
+        (TYPE_NEW_APPLICATION, 'Новая заявка'),
+    ]
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='notifications')
+    notification_type = models.CharField(max_length=50, choices=NOTIFICATION_TYPE_CHOICES)
+    content = models.CharField(max_length=255)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now)
+    application = models.ForeignKey(
+        'AnimalApplication',
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Уведомление для {self.user.email}: {self.content[:50]}"
+
+
+@receiver(post_save, sender=AnimalApplication)
+def create_notification_for_new_application(sender, instance, created, **kwargs):
+    if not created:
+        return
+
+    try:
+        owner = instance.animal.user
+    except Exception:
+        return
+
+    owner_id = getattr(owner, 'id', None)
+    if owner_id is None:
+        return
+
+    # Если заявитель и создатель один и тот же - скип
+    if owner_id == instance.user_id:
+        return
+
+    try:
+        Notification.objects.create(
+            user=owner,
+            notification_type=Notification.TYPE_NEW_APPLICATION,
+            content='На ваше объявление пришёл отклик!',
+            application=instance,
+        )
+    except Exception:
+        pass

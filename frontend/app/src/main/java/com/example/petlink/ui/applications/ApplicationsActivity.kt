@@ -36,6 +36,11 @@ class ApplicationsActivity : AppCompatActivity() {
     private var currentStatus: String? = null
     private lateinit var adapter: ApplicationAdapter
 
+    companion object {
+        @Volatile
+        var isForeground: Boolean = false
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_applications)
@@ -75,7 +80,13 @@ class ApplicationsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        isForeground = true
         loadData()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        isForeground = false
     }
 
     private fun loadData() {

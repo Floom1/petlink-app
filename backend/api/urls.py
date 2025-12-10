@@ -15,6 +15,7 @@ router.register(r'service_photos', views.ServicePhotoViewSet)
 router.register(r'tests', views.TestResultViewSet)
 router.register(r'animal_apps', views.AnimalApplicationViewSet)
 router.register(r'service_apps', views.ServiceApplicationViewSet)
+router.register(r'notifications', views.NotificationViewSet, basename='notification')
 
 
 

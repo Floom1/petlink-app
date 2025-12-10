@@ -1,16 +1,23 @@
 package com.example.petlink.ui
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.GridLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+
 import com.example.petlink.R
 import com.example.petlink.ui.auth.LoginActivity
 import com.example.petlink.ui.home.HomeContent
 import com.example.petlink.ui.test.TestActivity
 import com.example.petlink.util.BottomNavHelper
+import com.example.petlink.util.NotificationsScheduler
 import com.example.petlink.util.RetrofitClient
 import com.example.petlink.util.UserSession
 import retrofit2.Call
@@ -27,6 +34,13 @@ class MainActivity : AppCompatActivity()  {
         val token = sharedPreferences.getString("auth_token", null)
         val isLoggedIn = sharedPreferences.getBoolean("is_logged_in", false) && !token.isNullOrEmpty()
         val isGuest = UserSession.isGuestMode(this)
+
+        if (isLoggedIn && !isGuest) {
+            NotificationsScheduler.schedule(this)
+            requestNotificationPermissionIfNeeded()
+        } else {
+            NotificationsScheduler.cancel(this)
+        }
 
         if (!isLoggedIn && !isGuest) {
             startActivity(Intent(this, LoginActivity::class.java))
@@ -75,6 +89,22 @@ class MainActivity : AppCompatActivity()  {
                     // Игнорируем ошибки сети
                 }
             })
+        }
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val granted = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!granted) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    1001
+                )
+            }
         }
     }
 }

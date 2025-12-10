@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#DDF8FC">
+
+    <include layout="@layout/toolbar" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <Button
+            android:id="@+id/btnBackScreen"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Назад"
+            app:backgroundTint="@null"
+            android:background="@drawable/btn_stroke_black"
+            android:textColor="#fff" />
+
+        <TextView
+            android:id="@+id/tvSettingsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Настройки уведомлений"
+            android:textSize="20sp"
+            android:textColor="#000000"
+            android:textAlignment="center" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Уведомления о новых заявках"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+
+            <Switch
+                android:id="@+id/switch_notifications"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <include
+        layout="@layout/nav_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

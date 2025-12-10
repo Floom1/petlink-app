@@ -19,12 +19,22 @@
 
     <TextView
         android:id="@+id/rt8qjc2wc9s"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="27dp"
         android:layout_marginBottom="12dp"
+        android:layout_weight="1"
         android:fontFamily="sans-serif"
         android:text="PetLink"
         android:textColor="#000000"
         android:textSize="26sp" />
+
+    <ImageView
+        android:id="@+id/ivSettings"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="24dp"
+        android:visibility="gone"
+        android:src="@drawable/ic_settings" />
 </LinearLayout>

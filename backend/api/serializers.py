@@ -157,6 +157,13 @@ class ServicePhotoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'notification_type', 'content', 'is_read', 'created_at', 'application']
+        read_only_fields = fields
+
+
 class TestResultSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source='user.id', read_only=True)
 

@@ -321,6 +321,33 @@ class ServiceApplicationViewSet(viewsets.ModelViewSet):
     serializer_class = ServiceApplicationSerializer
 
 
+class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = Notification.objects.filter(user=self.request.user)
+        only_unread = self.request.query_params.get('only_unread')
+        if only_unread in (None, '', 'true', '1', 'yes'):
+            qs = qs.filter(is_read=False)
+        return qs.order_by('-created_at')
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated], url_path='mark-as-read')
+    def mark_as_read(self, request):
+        ids = request.data.get('ids')
+        single_id = request.data.get('id')
+        if ids is None and single_id is not None:
+            ids = [single_id]
+        if not ids:
+            return Response({'detail': 'Не переданы идентификаторы уведомлений'}, status=400)
+        try:
+            id_list = [int(i) for i in ids]
+        except Exception:
+            return Response({'detail': 'Идентификаторы должны быть числами'}, status=400)
+        Notification.objects.filter(user=request.user, id__in=id_list).update(is_read=True)
+        return Response({'status': 'ok'})
+
+
 User = get_user_model()
 
 class RegisterAPI(generics.CreateAPIView):

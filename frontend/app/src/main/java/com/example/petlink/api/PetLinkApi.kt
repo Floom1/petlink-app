@@ -14,6 +14,7 @@ import com.example.petlink.data.model.AnimalSimpleResponse
 import com.example.petlink.data.model.UserResponse
 import com.example.petlink.data.model.AnimalApplication
 import com.example.petlink.data.model.AnimalApplicationCreate
+import com.example.petlink.data.model.NotificationItem
 
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -183,6 +184,18 @@ interface PetLinkApi {
         @Header("Authorization") authHeader: String,
         @Path("id") id: Int
     ): Call<AnimalApplication>
+
+    @GET("api/notifications/")
+    fun getNotifications(
+        @Header("Authorization") authHeader: String,
+        @Query("only_unread") onlyUnread: Boolean? = true
+    ): Call<List<NotificationItem>>
+
+    @POST("api/notifications/mark-as-read/")
+    fun markNotificationsAsRead(
+        @Header("Authorization") authHeader: String,
+        @Body body: Map<String, @JvmSuppressWildcards Any?>
+    ): Call<Map<String, Any>>
 
     // Favorites
     @GET("api/animals/favorites/")

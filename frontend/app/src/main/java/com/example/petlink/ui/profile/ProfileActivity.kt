@@ -42,6 +42,13 @@ class ProfileActivity : AppCompatActivity() {
         setContentView(R.layout.activity_profile)
         BottomNavHelper.wire(this)
 
+        findViewById<ImageView>(R.id.ivSettings)?.apply {
+            visibility = View.VISIBLE
+            setOnClickListener {
+                startActivity(Intent(this@ProfileActivity, NotificationSettingsActivity::class.java))
+            }
+        }
+
         val scrollView = findViewById<ScrollView>(R.id.profile_scroll)
         val guestStub = findViewById<LinearLayout>(R.id.guest_profile_stub)
         val guestLoginButton = findViewById<Button>(R.id.btn_guest_login_profile)
