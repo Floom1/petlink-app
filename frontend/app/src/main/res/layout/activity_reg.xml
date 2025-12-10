@@ -77,6 +77,41 @@
                 android:padding="10dp"
                 android:textColor="#000"/>
 
+            <CheckBox
+                android:id="@+id/checkbox_is_shelter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:text="Вы представитель приюта?"
+                android:textColor="#000000" />
+
+            <TextView
+                android:id="@+id/shelter_legal_name_label"
+                android:layout_width="230dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:text="Юридическое название"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:gravity="start"
+                android:visibility="gone" />
+            <EditText
+                android:id="@+id/shelter_legal_name"
+                android:layout_width="230dp"
+                android:layout_height="40dp"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:hint="Например: ООО &quot;Счастливые лапки&quot;"
+                android:textColorHint="#6a6a6a"
+                android:layout_marginTop="6dp"
+                android:layout_gravity="center"
+                android:background="@drawable/edittext_rounded_border"
+                android:padding="10dp"
+                android:textColor="#000"
+                android:visibility="gone" />
+
             <TextView
                 android:layout_width="230dp"
                 android:layout_height="wrap_content"

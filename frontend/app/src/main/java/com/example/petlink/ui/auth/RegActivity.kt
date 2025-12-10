@@ -2,10 +2,13 @@ package com.example.petlink.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+
 import androidx.appcompat.app.AppCompatActivity
 import com.example.petlink.ui.MainActivity
 import com.example.petlink.R
@@ -21,6 +24,10 @@ class RegActivity : AppCompatActivity() {
     private lateinit var userEmail: EditText
     private lateinit var userPassword: EditText
     private lateinit var userPasswordConfirm: EditText
+    private lateinit var shelterCheckBox: CheckBox
+    private lateinit var shelterLegalName: EditText
+    private var originalLoginHint: String? = null
+    private var savedUserName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,9 +37,32 @@ class RegActivity : AppCompatActivity() {
         userEmail = findViewById(R.id.user_email)
         userPassword = findViewById(R.id.user_password)
         userPasswordConfirm = findViewById(R.id.user_password_confirm)
+        shelterCheckBox = findViewById(R.id.checkbox_is_shelter)
+        shelterLegalName = findViewById(R.id.shelter_legal_name)
+        val shelterLegalNameLabel: TextView = findViewById(R.id.shelter_legal_name_label)
+        originalLoginHint = userLogin.hint?.toString()
         val toAuth: TextView = findViewById(R.id.link_to_auth)
         val regButton: Button = findViewById(R.id.button_reg)
         val skipButton: TextView = findViewById(R.id.button_skip_reg)
+
+        shelterCheckBox.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                savedUserName = userLogin.text.toString()
+                userLogin.text.clear()
+                userLogin.hint = "Полное название приюта"
+                shelterLegalName.visibility = View.VISIBLE
+                shelterLegalNameLabel.visibility = View.VISIBLE
+            } else {
+                if (!savedUserName.isNullOrEmpty()) {
+                    userLogin.setText(savedUserName)
+                }
+                if (originalLoginHint != null) {
+                    userLogin.hint = originalLoginHint
+                }
+                shelterLegalName.visibility = View.GONE
+                shelterLegalNameLabel.visibility = View.GONE
+            }
+        }
 
         toAuth.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
@@ -54,9 +84,16 @@ class RegActivity : AppCompatActivity() {
         val email = userEmail.text.toString().trim()
         val pass = userPassword.text.toString().trim()
         val passConf = userPasswordConfirm.text.toString().trim()
+        val isShelter = shelterCheckBox.isChecked
+        val shelterName = shelterLegalName.text.toString().trim()
+
+        if (isShelter && shelterName.isEmpty()) {
+            Toast.makeText(this, "Пожалуйста, введите юридическое название приюта", Toast.LENGTH_LONG).show()
+            return
+        }
 
         if (login.isEmpty() || email.isEmpty() || pass.isEmpty() || passConf.isEmpty()) {
-            Toast.makeText(this, "Не все поля заполнены", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Заполните все поля", Toast.LENGTH_LONG).show()
             return
         }
 
@@ -69,7 +106,8 @@ class RegActivity : AppCompatActivity() {
             email = email,
             full_name = login,
             password = pass,
-            is_shelter = false
+            is_shelter = isShelter,
+            shelter_name = if (isShelter) shelterName else null
         )
 
         RetrofitClient.apiService.register(registrationRequest).enqueue(object : retrofit2.Callback<AuthResponse> {

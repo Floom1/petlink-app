@@ -5,5 +5,6 @@ data class RegistrationRequest(
     val email: String,
     val full_name: String,
     val password: String,
-    val is_shelter: Boolean
+    val is_shelter: Boolean,
+    val shelter_name: String? = null
 )
