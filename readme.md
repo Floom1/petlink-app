@@ -5,7 +5,7 @@
 [![Django REST](https://img.shields.io/badge/Django-REST%20Framework-092E20?logo=django&logoColor=white)]()
 [![Status](https://img.shields.io/badge/Project-Course%20Work-blue)]()
 
-PetLink — мобильное приложение и backend‑сервис для подбора животных из приютов и частных объявлений.
+PetLink - мобильное приложение и backend‑сервис для подбора животных из приютов и частных объявлений.
 Приложение поддерживает роли покупателя и приюта, гостевой режим, тест совместимости, систему заявок и уведомлений.
 
 ---
@@ -55,10 +55,10 @@ PetLink — мобильное приложение и backend‑сервис д
 
 ## Архитектура
 
-Репозиторий — монорепо из двух основных частей:
+Репозиторий - монорепо из двух основных частей:
 
-- [backend/](cci:7://file:///c:/Code/petlink-project/backend:0:0-0:0) — Django REST API.
-- [frontend/app/](cci:7://file:///c:/Code/petlink-project/frontend/app:0:0-0:0) — Android‑приложение на Kotlin.
+- [backend/](cci:7://file:///c:/Code/petlink-project/backend:0:0-0:0) - Django REST API.
+- [frontend/app/](cci:7://file:///c:/Code/petlink-project/frontend/app:0:0-0:0) - Android‑приложение на Kotlin.
 
 ### Backend (Django + DRF)
 
@@ -90,34 +90,34 @@ PetLink — мобильное приложение и backend‑сервис д
   - `AnimalApplicationViewSet`:
     - фильтрация по роли и статусу,
     - логика смены статуса с переводом животного в архив и отклонением остальных заявок.
-  - `ShelterStatsViewSet` — генерация CSV‑отчётов по продажам/покупкам.
-  - `NotificationViewSet` — чтение и массовая отметка о прочтении.
+  - `ShelterStatsViewSet` - генерация CSV‑отчётов по продажам/покупкам.
+  - `NotificationViewSet` - чтение и массовая отметка о прочтении.
   - API для регистрации, получения текущего пользователя, загрузки файлов и запроса письма для сброса пароля.
 
 - [petlink_api/urls.py](cci:7://file:///c:/Code/petlink-project/backend/petlink_api/urls.py:0:0-0:0)
-  - [api/](cci:7://file:///c:/Code/petlink-project/backend/api:0:0-0:0) — маршруты основного API (viewset’ы через `api/urls.py`).
-  - `api-token-auth/` — получение токена.
+  - [api/](cci:7://file:///c:/Code/petlink-project/backend/api:0:0-0:0) - маршруты основного API (viewset’ы через `api/urls.py`).
+  - `api-token-auth/` - получение токена.
   - `api/auth/register/`, `api/auth/user/`.
-  - `api/auth/password-reset/*` — стандартные Django‑вью для подтверждения и завершения сброса пароля.
+  - `api/auth/password-reset/*` - стандартные Django‑вью для подтверждения и завершения сброса пароля.
 
 - [api/tests/](cci:7://file:///c:/Code/petlink-project/backend/api/tests:0:0-0:0)
-  - [test_models.py](cci:7://file:///c:/Code/petlink-project/backend/api/tests/test_models.py:0:0-0:0) — юнит‑тесты модели пользователя, сущностей вида/породы/животного.
-  - [test_views.py](cci:7://file:///c:/Code/petlink-project/backend/api/tests/test_views.py:0:0-0:0) — интеграционные тесты API регистрации, логина, фильтрации животных.
+  - [test_models.py](cci:7://file:///c:/Code/petlink-project/backend/api/tests/test_models.py:0:0-0:0) - юнит‑тесты модели пользователя, сущностей вида/породы/животного.
+  - [test_views.py](cci:7://file:///c:/Code/petlink-project/backend/api/tests/test_views.py:0:0-0:0) - интеграционные тесты API регистрации, логина, фильтрации животных.
 
 ### Android (Kotlin)
 
 Пакеты:
 
 - [ui/](cci:7://file:///c:/Code/petlink-project/frontend/app/src/main/java/com/example/petlink/ui:0:0-0:0)
-  - `HomeContent` — главный экран с лентой животных и фильтрами .
-  - `ui/home/AnimalDetailActivity` — карточка животного, теги, избранное, подача заявки.
-  - `ui/ads/MyAdsActivity` + `MyAdsFragment` — «Мои объявления» (активные/архив).
-  - `ui/myanimal/EditAnimalActivity`, `MyAnimalDetailActivity` — создание/редактирование/удаление объявления, управление фотогалереей.
-  - `ui/favorites/FavoritesActivity` — избранное.
-  - `ui/applications/ApplicationsActivity` — заявки и их детализация.
-  - `ui/auth/LoginActivity`, `RegActivity` — аутентификация и регистрация (с восстановлением пароля).
-  - `ui/test/TestActivity` — прохождение теста совместимости.
-  - `ui/profile/ProfileActivity`, `NotificationSettingsActivity` — профиль пользователя, отчёты, настройки уведомлений.
+  - `HomeContent` - главный экран с лентой животных и фильтрами .
+  - `ui/home/AnimalDetailActivity` - карточка животного, теги, избранное, подача заявки.
+  - `ui/ads/MyAdsActivity` + `MyAdsFragment` - «Мои объявления» (активные/архив).
+  - `ui/myanimal/EditAnimalActivity`, `MyAnimalDetailActivity` - создание/редактирование/удаление объявления, управление фотогалереей.
+  - `ui/favorites/FavoritesActivity` - избранное.
+  - `ui/applications/ApplicationsActivity` - заявки и их детализация.
+  - `ui/auth/LoginActivity`, `RegActivity` - аутентификация и регистрация (с восстановлением пароля).
+  - `ui/test/TestActivity` - прохождение теста совместимости.
+  - `ui/profile/ProfileActivity`, `NotificationSettingsActivity` - профиль пользователя, отчёты, настройки уведомлений.
 
 - `data/model/`
   - Data классы для животных, фотографий, статусов, пользователей, тестов, заявок, уведомлений.
@@ -126,10 +126,10 @@ PetLink — мобильное приложение и backend‑сервис д
   - Retrofit‑интерфейс для всех REST‑эндпоинтов backend.
 
 - [util/](cci:7://file:///c:/Code/petlink-project/frontend/app/src/main/java/com/example/petlink/util:0:0-0:0)
-  - `RetrofitClient` — настройка Retrofit.
-  - `UserSession` — работа с сессией пользователя и гостевым режимом (SharedPreferences).
-  - `BottomNavHelper` — нижняя навигация и подсветка иконки уведомлений.
-  - `NotificationsWorker`, `NotificationsScheduler`, `NotificationHelper`, `NotificationPreferences` — фоновые задачи и отображение уведомлений.
+  - `RetrofitClient` - настройка Retrofit.
+  - `UserSession` - работа с сессией пользователя и гостевым режимом (SharedPreferences).
+  - `BottomNavHelper` - нижняя навигация и подсветка иконки уведомлений.
+  - `NotificationsWorker`, `NotificationsScheduler`, `NotificationHelper`, `NotificationPreferences` - фоновые задачи и отображение уведомлений.
 
 
 
@@ -216,7 +216,7 @@ python manage.py runserver 0.0.0.0:8000
 
 ## Примеры запросов к API
 
-Ниже — несколько запросов к backend API (предполагается запущенный сервер на `http://127.0.0.1:8000`).
+Ниже - несколько запросов к backend API (предполагается запущенный сервер на `http://127.0.0.1:8000`).
 
 ### Регистрация пользователя
 
