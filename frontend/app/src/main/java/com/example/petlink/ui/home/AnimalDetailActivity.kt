@@ -59,13 +59,10 @@ class AnimalDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.animal_detail)
 
-        // Initialize views
         initViews()
 
-        // Get animal ID from intent (всегда Int, чтобы не терять значение)
         animalId = intent.getIntExtra("animal_id", 0)
 
-        // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
 
         val isGuest = com.example.petlink.util.UserSession.isGuestMode(this)
@@ -76,7 +73,6 @@ class AnimalDetailActivity : AppCompatActivity() {
 
         api = RetrofitClient.apiService
         fetchCurrentUser()
-        // Load animal details
         loadAnimalDetails()
 
         btnFavorite.setOnClickListener {

@@ -81,7 +81,7 @@ class EditAnimalActivity : AppCompatActivity() {
         wireUi()
 
         loadDictionaries {
-            if (animalId != null) loadExisting() // edit mode
+            if (animalId != null) loadExisting()
         }
     }
 
@@ -207,7 +207,6 @@ class EditAnimalActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val a = response.body()
                     if (a != null) fillForm(a)
-                    // load photos
                     RetrofitClient.apiService.getAnimalPhotos(a?.id).enqueue(object: Callback<List<AnimalPhotoReq>> {
                         override fun onResponse(call2: Call<List<AnimalPhotoReq>>, resp: Response<List<AnimalPhotoReq>>) {
                             if (resp.isSuccessful) {
@@ -230,7 +229,6 @@ class EditAnimalActivity : AppCompatActivity() {
 
     private fun updateDeleteVisibility(a: AnimalSimpleResponse?) {
         if (a == null) return
-        // Only show delete if active (available)
         btnDeleteTop.visibility = View.VISIBLE
     }
 
@@ -244,11 +242,9 @@ class EditAnimalActivity : AppCompatActivity() {
         cbVaccinations.isChecked = a.has_vaccinations == true
         cbHypoallergenic.isChecked = a.is_hypoallergenic == true
         cbChildFriendly.isChecked = a.child_friendly == true
-        // space
         val idx = when (a.space_requirements) { "low" -> 0; "high" -> 2; else -> 1 }
         spinnerSpace.setSelection(idx)
         if (a.price == null || a.price == 0.0) { cbFree.isChecked = true; etPrice.visibility = View.GONE } else { etPrice.setText(a.price.toString()) }
-        // species/breed selection by IDs
         val breed = a.breed
         val speciesId = breedList.firstOrNull { it.id == breed }?.species
         val spIndex = speciesList.indexOfFirst { it.id == speciesId }

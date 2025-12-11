@@ -70,7 +70,6 @@ class ApplicationAdapter(
 
         private fun formatDate(createdAt: String?): String {
             if (createdAt.isNullOrEmpty()) return ""
-            // Ожидаем формат ISO: YYYY-MM-DDTHH:MM:SS...
             val datePart = createdAt.split('T', ' ').firstOrNull() ?: createdAt
             val parts = datePart.split('-')
             return if (parts.size == 3) {

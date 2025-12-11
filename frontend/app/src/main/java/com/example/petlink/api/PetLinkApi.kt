@@ -170,7 +170,6 @@ interface PetLinkApi {
         @Path("id") id: Int
     ): Call<Void>
 
-    // Applications (animal)
     @POST("api/animal_apps/")
     fun createAnimalApplication(
         @Header("Authorization") authHeader: String,
@@ -210,7 +209,6 @@ interface PetLinkApi {
         @Body body: Map<String, @JvmSuppressWildcards Any?>
     ): Call<Map<String, Any>>
 
-    // Favorites
     @GET("api/animals/favorites/")
     fun getFavoriteAnimals(
         @Header("Authorization") authHeader: String

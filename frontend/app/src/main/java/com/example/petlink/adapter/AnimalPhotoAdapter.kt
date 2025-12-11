@@ -21,7 +21,6 @@ class AnimalPhotoAdapter(private val photos: List<AnimalPhotoReq>) : PagerAdapte
         val imageView = view.findViewById<ImageView>(R.id.imageView)
 
         if (photos.isEmpty()) {
-            // Show default image when no photos
             Glide.with(container.context)
                 .load(R.drawable.placeholder_animal)
                 .into(imageView)

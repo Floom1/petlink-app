@@ -77,8 +77,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'petlink_api.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
 
 
 DATABASES = {
@@ -108,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Email settings
+# Настройки почты
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
@@ -119,8 +118,7 @@ EMAIL_HOST_PASSWORD = 'bnufhkwcripaunvu'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
+
 
 LANGUAGE_CODE = 'ru'
 
@@ -131,13 +129,9 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

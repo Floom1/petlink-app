@@ -387,35 +387,27 @@ class AnimalApplication(models.Model):
         if self.user.is_shelter:
             return []
 
-        # Берем данные из TestResult (OneToOne с пользователем)
         try:
             tr = self.user.test_result
         except TestResult.DoesNotExist:
-            # По логике приложения тест обязателен, но на всякий случай возвращаем пусто
             return []
 
         risks = []
 
-        # Жилье
         if tr.residence_type == 'apartment':
             risks.append('Квартира (ограниченное пространство)')
 
-        # Время дома по будням
         if tr.weekday_time == 'lt4':
             risks.append('Проводит дома менее 4 часов')
         elif tr.weekday_time == '4_8':
             risks.append('Проводит дома 4–8 часов')
-        # gt8 — не добавляем риск
 
-        # Дети
         if tr.has_children:
             risks.append('Есть дети')
 
-        # Переезд
         if tr.planned_move:
             risks.append('Планируется переезд')
 
-        # Опыт владения питомцами
         if tr.pet_experience == 'none':
             risks.append('Нет опыта владения домашним питомцем')
         elif tr.pet_experience == 'now':
@@ -423,7 +415,6 @@ class AnimalApplication(models.Model):
         elif tr.pet_experience == 'had_before':
             risks.append('Ранее был домашний питомец')
 
-        # Аллергии
         if tr.has_allergies:
             risks.append('Есть аллергии')
 

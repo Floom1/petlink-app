@@ -162,10 +162,10 @@ class ApplicationsActivity : AppCompatActivity() {
     private fun updateFilterUi() {
         fun style(btn: Button, selected: Boolean) {
             if (selected) {
-                btn.setBackgroundColor(0xFF4CAF50.toInt()) // green
+                btn.setBackgroundColor(0xFF4CAF50.toInt())
                 btn.setTextColor(0xFFFFFFFF.toInt())
             } else {
-                btn.setBackgroundColor(0xFFE0E0E0.toInt()) // light gray
+                btn.setBackgroundColor(0xFFE0E0E0.toInt())
                 btn.setTextColor(0xFF000000.toInt())
             }
         }
