@@ -1,7 +1,6 @@
 #Android studio
 
 #built application files
-*.apk
 *.ap_
 *.aab
 
