@@ -39,6 +39,18 @@ interface PetLinkApi {
     @POST("api-token-auth/")
     fun login(@Body loginRequest: LoginRequest): Call<AuthResponse>
 
+    @POST("api/auth/password-reset/")
+    fun requestPasswordReset(
+        @Body body: Map<String, @JvmSuppressWildcards String>
+    ): Call<Map<String, Any>>
+
+    @POST("api/auth/password-reset-confirm/{uidb64}/{token}/")
+    fun confirmPasswordReset(
+        @Path("uidb64") uidb64: String,
+        @Path("token") token: String,
+        @Body body: Map<String, @JvmSuppressWildcards String>
+    ): Call<Map<String, Any>>
+
     @GET("api/animals/")
     fun getAnimals(
         @Header("Authorization") authHeader: String? = null,

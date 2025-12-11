@@ -14,6 +14,7 @@ from django.core.files.storage import FileSystemStorage
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Q
 from rest_framework.decorators import action
+from django.contrib.auth.forms import PasswordResetForm
 
 
 class AnimalViewSet(viewsets.ModelViewSet):
@@ -542,3 +543,23 @@ class UploadView(APIView):
 
         url = request.build_absolute_uri(settings.MEDIA_URL + relative_path)
         return Response({"url": url}, status=201)
+
+
+class PasswordResetRequestAPI(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        if not email:
+            return Response({'detail': 'Поле email обязательно'}, status=400)
+
+        form = PasswordResetForm({'email': email})
+        if form.is_valid():
+            form.save(
+                request=request._request,
+                email_template_name='registration/password_reset_email.html',
+            )
+
+        return Response({
+            'detail': 'Если аккаунт с таким email существует, мы отправили письмо для сброса пароля'
+        })

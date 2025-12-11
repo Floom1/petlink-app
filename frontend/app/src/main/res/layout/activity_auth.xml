@@ -89,6 +89,17 @@
         android:textSize="17dp" />
 
     <TextView
+        android:id="@+id/link_forgot_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="12dp"
+        android:fontFamily="sans-serif"
+        android:text="Забыли пароль?"
+        android:textColor="#000000"
+        android:textSize="15sp" />
+
+    <TextView
         android:id="@+id/button_skip_auth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

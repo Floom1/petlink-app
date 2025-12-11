@@ -7,6 +7,9 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
+import android.text.InputType
+
 import com.example.petlink.ui.MainActivity
 import com.example.petlink.R
 import com.example.petlink.ui.test.TestActivity
@@ -46,6 +49,7 @@ class LoginActivity : AppCompatActivity() {
         val toReg: TextView = findViewById(R.id.link_to_reg)
         val loginButton: Button = findViewById(R.id.button_auth)
         val skipButton: TextView = findViewById(R.id.button_skip_auth)
+        val forgotPassword: TextView = findViewById(R.id.link_forgot_password)
 
         toReg.setOnClickListener {
             startActivity(Intent(this, RegActivity::class.java))
@@ -60,6 +64,67 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
+
+        forgotPassword.setOnClickListener {
+            showPasswordResetDialog()
+        }
+    }
+
+    private fun showPasswordResetDialog() {
+        val input = EditText(this)
+        input.hint = "Введите email"
+        input.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+
+        AlertDialog.Builder(this)
+            .setTitle("Восстановление пароля")
+            .setView(input)
+            .setPositiveButton("Отправить") { dialog, _ ->
+                val email = input.text.toString().trim()
+                if (email.isEmpty()) {
+                    Toast.makeText(this, "Введите email", Toast.LENGTH_LONG).show()
+                    return@setPositiveButton
+                }
+                sendPasswordResetRequest(email)
+                dialog.dismiss()
+            }
+            .setNegativeButton("Отмена") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun sendPasswordResetRequest(email: String) {
+        val body = mapOf("email" to email)
+
+        RetrofitClient.apiService.requestPasswordReset(body)
+            .enqueue(object : Callback<Map<String, Any>> {
+                override fun onResponse(
+                    call: Call<Map<String, Any>>,
+                    response: Response<Map<String, Any>>
+                ) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Письмо успешно отправлено! Проверьте свой почтовый ящик.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Не удалось отправить письмо. Попробуйте позже.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<Map<String, Any>>, t: Throwable) {
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "Ошибка соединения: ${t.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            })
     }
 
     private fun login() {
