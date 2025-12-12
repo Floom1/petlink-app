@@ -313,4 +313,4 @@ curl -X POST http://localhost:8000/api/animal_apps/ \
 ---
 ### Получение APK
 
-Для получения APK перейдите по [ссылке](https://disk.yandex.ru/d/-kiY3gms7l3bDw).
+Для получения APK перейдите по [ссылке](https://disk.yandex.ru/d/SXLxS0-AO3oZ8A).
